@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { DocumentCard } from "@/components/ui/DocumentCard";
 import { Toast } from "@/components/ui/Toast";
 import { AiAssistantButton, SuggestionPopover, useProactiveReview } from "@/features/ai-assistant";
@@ -10,6 +12,11 @@ import type { EditorDocument } from "@/types/document";
 import { DocumentEditor } from "./DocumentEditor";
 import { EditorToolbar } from "./EditorToolbar";
 import { WordCountPill } from "./WordCountPill";
+import {
+  PAGE_GAP_HEIGHT,
+  PAPER_CONTENT_HEIGHTS,
+  setPageView,
+} from "../extensions/page-view";
 import { useAutosaveDocument } from "../hooks/useAutosaveDocument";
 import { useDocumentEditor } from "../hooks/useDocumentEditor";
 import { useSaveShortcutToast } from "../hooks/useSaveShortcutToast";
@@ -29,6 +36,17 @@ export function EditorScreen({ document }: EditorScreenProps) {
   useProactiveReview(editor);
   const isSaveToastVisible = useSaveShortcutToast();
   const { pageWidth, pageLayout, paperSize, fontSize } = useUiPreferencesStore();
+
+  // Page view follows the page-setup preferences.
+  useEffect(() => {
+    if (!editor) return;
+    setPageView(
+      editor,
+      pageLayout === "pages"
+        ? { pageHeight: PAPER_CONTENT_HEIGHTS[paperSize], gapHeight: PAGE_GAP_HEIGHT }
+        : null,
+    );
+  }, [editor, pageLayout, paperSize]);
 
   return (
     <>

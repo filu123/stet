@@ -68,7 +68,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
     <div
       role="toolbar"
       aria-label="Formatting"
-      className="flex items-center gap-0.5 overflow-x-auto"
+      className="flex flex-wrap items-center gap-0.5"
     >
       <ToolbarButton label="Undo" isDisabled={!state.canUndo} onClick={() => chain().undo().run()}>
         <Undo2 className="size-3.5" aria-hidden />

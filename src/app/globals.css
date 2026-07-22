@@ -416,26 +416,26 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
- * Page setup: paper heights (96dpi, minus card padding) and page guides
+ * Page view ("Pages" layout): injected gap widgets render the document as
+ * separate sheets, Google Docs-style. Heights come from the page-view plugin.
  * ------------------------------------------------------------------------- */
 
-.document-card[data-paper="a4"] {
-  --page-height: 987px; /* A4 (1123px) minus vertical page margins */
+.document-card {
+  --card-pad-x: 2rem;
 }
 
-.document-card[data-paper="letter"] {
-  --page-height: 920px; /* US Letter (1056px) minus vertical page margins */
+@media (min-width: 640px) {
+  .document-card {
+    --card-pad-x: 3.5rem;
+  }
 }
 
-/* "Pages" layout: a faint guide line at every paper-height interval */
-.document-card[data-layout="pages"] .editor-body {
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(var(--page-height) - 1.5px),
-    var(--border-subtle) calc(var(--page-height) - 1.5px),
-    var(--border-subtle) var(--page-height)
-  );
+.tiptap-content .page-gap {
+  margin: 0 calc(-1 * var(--card-pad-x));
+  background: var(--surface-app);
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  pointer-events: none;
 }
 
 /* Editor text size setting */
@@ -478,8 +478,8 @@ body {
     padding: 0 !important;
   }
 
-  .document-card[data-layout="pages"] .editor-body {
-    background-image: none;
+  .tiptap-content .page-gap {
+    display: none;
   }
 
   .tiptap-content .page-break {

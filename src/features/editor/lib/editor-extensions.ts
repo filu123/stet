@@ -8,6 +8,7 @@ import { AiMarkupExtension } from "@/features/ai-assistant";
 import { CircleMark } from "../extensions/circle-mark";
 import { ColoredUnderline } from "../extensions/colored-underline";
 import { PageBreak } from "../extensions/page-break";
+import { PageViewExtension } from "../extensions/page-view";
 
 /**
  * The single source of truth for the editor's schema.
@@ -22,6 +23,7 @@ export function buildEditorExtensions(): Extensions {
     Highlight.configure({ multicolor: true }),
     CircleMark,
     PageBreak,
+    PageViewExtension,
     Placeholder.configure({ placeholder: "Start writing…" }),
     AiMarkupExtension,
   ];
