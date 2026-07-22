@@ -434,9 +434,11 @@ body {
   pointer-events: none;
 }
 
-/* Only the band is gray — the filler above and padding below stay page-white */
+/* Only the band is gray — the filler above and padding below stay page-white.
+   Extends 1.5px past the card's own border to interrupt its side lines, so
+   sheets read as truly separate. */
 .tiptap-content .page-gap .page-gap-band {
-  margin: 0 calc(-1 * var(--card-pad-x));
+  margin: 0 calc(-1 * var(--card-pad-x) - 1.5px);
   background: var(--surface-app);
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
