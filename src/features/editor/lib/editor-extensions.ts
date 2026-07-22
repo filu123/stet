@@ -6,6 +6,7 @@ import { StarterKit } from "@tiptap/starter-kit";
 import { AiMarkupExtension } from "@/features/ai-assistant";
 
 import { CircleMark } from "../extensions/circle-mark";
+import { ColoredUnderline } from "../extensions/colored-underline";
 
 /**
  * The single source of truth for the editor's schema.
@@ -14,7 +15,9 @@ import { CircleMark } from "../extensions/circle-mark";
  */
 export function buildEditorExtensions(): Extensions {
   return [
-    StarterKit,
+    // ColoredUnderline replaces StarterKit's plain underline
+    StarterKit.configure({ underline: false }),
+    ColoredUnderline,
     Highlight.configure({ multicolor: true }),
     CircleMark,
     Placeholder.configure({ placeholder: "Start writing…" }),

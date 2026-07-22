@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { useEditorState, type Editor } from "@tiptap/react";
 
+import { ToolbarButton } from "@/components/ui/ToolbarButton";
 import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 import { readApiKey } from "@/features/settings";
 import { cn } from "@/lib/utils/cn";
@@ -33,11 +34,20 @@ const ACTIONS: readonly { action: RewriteAction; label: string }[] = [
  */
 export function AiBubbleMenuActions({ editor }: AiBubbleMenuActionsProps) {
   const [pendingAction, setPendingAction] = useState<RewriteAction | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const hasSelection = useEditorState({
     editor,
     selector: ({ editor: editorInstance }) => !editorInstance.state.selection.empty,
   });
+
+  // Collapse the actions whenever the selection goes away — React's documented
+  // "adjust state when props change" render-time pattern.
+  const [previousHasSelection, setPreviousHasSelection] = useState(hasSelection);
+  if (previousHasSelection !== hasSelection) {
+    setPreviousHasSelection(hasSelection);
+    if (!hasSelection && isExpanded) setIsExpanded(false);
+  }
 
   const handleAction = async (action: RewriteAction) => {
     if (pendingAction) return;
@@ -81,6 +91,7 @@ export function AiBubbleMenuActions({ editor }: AiBubbleMenuActionsProps) {
       store.failReview(error instanceof Error ? error.message : "The rewrite failed — try again.");
     } finally {
       setPendingAction(null);
+      setIsExpanded(false);
     }
   };
 
@@ -89,24 +100,35 @@ export function AiBubbleMenuActions({ editor }: AiBubbleMenuActionsProps) {
   return (
     <>
       <ToolbarDivider />
-      <Sparkles className="size-3 shrink-0 text-accent" aria-hidden />
-      {ACTIONS.map(({ action, label }) => (
-        <button
-          key={action}
-          type="button"
-          disabled={pendingAction !== null}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => void handleAction(action)}
-          className={cn(
-            "flex items-center gap-1 rounded-lg px-1.5 py-1 text-xs whitespace-nowrap transition-colors",
-            "text-content-secondary hover:bg-surface-hover hover:text-content-primary",
-            pendingAction !== null && pendingAction !== action && "opacity-40",
-          )}
-        >
-          {pendingAction === action && <Loader2 className="size-3 animate-spin" aria-hidden />}
-          {label}
-        </button>
-      ))}
+      <ToolbarButton
+        label="AI actions"
+        isActive={isExpanded}
+        onClick={() => setIsExpanded((current) => !current)}
+      >
+        {pendingAction !== null ? (
+          <Loader2 className="size-3.5 animate-spin text-accent" aria-hidden />
+        ) : (
+          <Sparkles className="size-3.5 text-accent" aria-hidden />
+        )}
+      </ToolbarButton>
+      {isExpanded &&
+        ACTIONS.map(({ action, label }) => (
+          <button
+            key={action}
+            type="button"
+            disabled={pendingAction !== null}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => void handleAction(action)}
+            className={cn(
+              "flex items-center gap-1 rounded-lg px-1.5 py-1 text-xs whitespace-nowrap transition-colors",
+              "text-content-secondary hover:bg-surface-hover hover:text-content-primary",
+              pendingAction !== null && pendingAction !== action && "opacity-40",
+            )}
+          >
+            {pendingAction === action && <Loader2 className="size-3 animate-spin" aria-hidden />}
+            {label}
+          </button>
+        ))}
     </>
   );
 }

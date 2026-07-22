@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
   Bold,
   Circle,
@@ -21,6 +23,7 @@ import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 import { AiBubbleMenuActions } from "@/features/ai-assistant";
 
 import { HIGHLIGHT_COLORS } from "../lib/highlight-colors";
+import { MarkColorSwatches } from "./MarkColorSwatches";
 
 interface FormattingBubbleMenuProps {
   editor: Editor;
@@ -31,6 +34,7 @@ interface FormattingBubbleMenuProps {
  * Flat surface, hairline border, no shadow (AGENTS.md).
  */
 export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
+  const [openColorPicker, setOpenColorPicker] = useState<"underline" | "circle" | null>(null);
   const activeStates = useEditorState({
     editor,
     selector: ({ editor: editorInstance }) => ({
@@ -75,17 +79,35 @@ export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
         <ToolbarButton
           label="Underline"
           isActive={activeStates.isUnderline}
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          onClick={() =>
+            setOpenColorPicker((current) => (current === "underline" ? null : "underline"))
+          }
         >
           <Underline className="size-3.5" aria-hidden />
         </ToolbarButton>
+        {openColorPicker === "underline" && (
+          <MarkColorSwatches
+            variant="underline"
+            isColorActive={(color) => editor.isActive("underline", { color })}
+            onPick={(color) => editor.chain().focus().toggleMark("underline", { color }).run()}
+          />
+        )}
         <ToolbarButton
           label="Circle text"
           isActive={activeStates.isCircle}
-          onClick={() => editor.chain().focus().toggleCircle().run()}
+          onClick={() =>
+            setOpenColorPicker((current) => (current === "circle" ? null : "circle"))
+          }
         >
           <Circle className="size-3.5 text-ai-circle" aria-hidden />
         </ToolbarButton>
+        {openColorPicker === "circle" && (
+          <MarkColorSwatches
+            variant="circle"
+            isColorActive={(color) => editor.isActive("circle", { color })}
+            onPick={(color) => editor.chain().focus().toggleCircle({ color }).run()}
+          />
+        )}
         <ToolbarButton
           label="Inline code"
           isActive={activeStates.isCode}
