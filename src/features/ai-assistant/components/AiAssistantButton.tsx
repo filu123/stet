@@ -112,7 +112,7 @@ export function AiAssistantButton({ editor }: AiAssistantButtonProps) {
   };
 
   return (
-    <div className="fixed right-6 bottom-6 z-40 flex items-center gap-2">
+    <div className="print-hidden fixed right-6 bottom-6 z-40 flex items-center gap-2">
       {phase === "error" && errorMessage && (
         <button
           type="button"

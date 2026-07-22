@@ -21,7 +21,7 @@ export function WordCountPill({ editor }: WordCountPillProps) {
   });
 
   return (
-    <div className="pointer-events-none sticky bottom-4 z-10 mt-auto flex pt-10">
+    <div className="print-hidden pointer-events-none sticky bottom-4 z-10 mt-auto flex pt-10">
       <span className="pointer-events-auto flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface-card px-3 py-1.5 text-xs text-content-tertiary">
         {words} {words === 1 ? "word" : "words"}
         <span aria-hidden>·</span>

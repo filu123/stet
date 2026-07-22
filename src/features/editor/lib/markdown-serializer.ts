@@ -35,6 +35,12 @@ const markdownSerializer = new MarkdownSerializer(
       state.write("```");
       state.closeBlock(node);
     },
+    // No Markdown syntax for page breaks — an HTML comment survives round trips
+    // through most tools without rendering.
+    pageBreak: (state, node) => {
+      state.write("<!-- page-break -->");
+      state.closeBlock(node);
+    },
   },
   {
     bold: defaultMarkdownSerializer.marks.strong,

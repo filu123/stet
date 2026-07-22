@@ -14,6 +14,7 @@ import {
   ListOrdered,
   Minus,
   Redo2,
+  SeparatorHorizontal,
   SquareCode,
   Strikethrough,
   TextQuote,
@@ -27,6 +28,7 @@ import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 
 import { HIGHLIGHT_COLORS } from "../lib/highlight-colors";
 import { MarkColorSwatches } from "./MarkColorSwatches";
+import { PageSetupControl } from "./PageSetupControl";
 import { PageWidthControl } from "./PageWidthControl";
 
 interface EditorToolbarProps {
@@ -147,6 +149,9 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton label="Divider line" onClick={() => chain().setHorizontalRule().run()}>
         <Minus className="size-3.5" aria-hidden />
       </ToolbarButton>
+      <ToolbarButton label="Insert page break (⌘↵)" onClick={() => chain().setPageBreak().run()}>
+        <SeparatorHorizontal className="size-3.5" aria-hidden />
+      </ToolbarButton>
 
       <ToolbarDivider />
 
@@ -168,6 +173,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <div className="ml-auto flex items-center gap-0.5 pl-2">
         <ToolbarDivider />
         <PageWidthControl />
+        <PageSetupControl />
       </div>
     </div>
   );

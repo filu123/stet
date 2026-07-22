@@ -389,3 +389,106 @@ body {
   pointer-events: none;
   color: var(--text-tertiary);
 }
+
+/* Manual page break: labeled dashed line on screen, a real break in print */
+.tiptap-content .page-break {
+  position: relative;
+  margin: 2rem 0;
+  border-top: 1.5px dashed var(--border-subtle);
+}
+
+.tiptap-content .page-break::after {
+  content: "Page break";
+  position: absolute;
+  top: -0.75em;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-card);
+  padding: 0 0.6em;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.tiptap-content .page-break.ProseMirror-selectednode {
+  border-top-color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------------
+ * Page setup: paper heights (96dpi, minus card padding) and page guides
+ * ------------------------------------------------------------------------- */
+
+.document-card[data-paper="a4"] {
+  --page-height: 987px; /* A4 (1123px) minus vertical page margins */
+}
+
+.document-card[data-paper="letter"] {
+  --page-height: 920px; /* US Letter (1056px) minus vertical page margins */
+}
+
+/* "Pages" layout: a faint guide line at every paper-height interval */
+.document-card[data-layout="pages"] .editor-body {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--page-height) - 1.5px),
+    var(--border-subtle) calc(var(--page-height) - 1.5px),
+    var(--border-subtle) var(--page-height)
+  );
+}
+
+/* Editor text size setting */
+.document-card[data-font-size="small"] .tiptap-content {
+  font-size: 0.9375rem;
+}
+
+.document-card[data-font-size="large"] .tiptap-content {
+  font-size: 1.1875rem;
+}
+
+/* ---------------------------------------------------------------------------
+ * Print: only the document, honestly paginated
+ * ------------------------------------------------------------------------- */
+@media print {
+  body {
+    background: white;
+  }
+
+  aside,
+  .app-topbar,
+  .editor-toolbar-card,
+  .print-hidden {
+    display: none !important;
+  }
+
+  .app-shell,
+  .app-main {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .document-card {
+    max-width: 100% !important;
+    min-height: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+
+  .document-card[data-layout="pages"] .editor-body {
+    background-image: none;
+  }
+
+  .tiptap-content .page-break {
+    margin: 0;
+    border: none;
+    break-after: page;
+  }
+
+  .tiptap-content .page-break::after {
+    content: none;
+  }
+}

@@ -28,20 +28,20 @@ export function EditorScreen({ document }: EditorScreenProps) {
   useAutosaveDocument(editor, document.id);
   useProactiveReview(editor);
   const isSaveToastVisible = useSaveShortcutToast();
-  const pageWidth = useUiPreferencesStore((state) => state.pageWidth);
+  const { pageWidth, pageLayout, paperSize, fontSize } = useUiPreferencesStore();
 
   return (
     <>
       {editor && (
-        <div className="sticky top-0 z-10 mb-5 rounded-xl border border-border-subtle bg-surface-card px-2 py-1.5">
+        <div className="editor-toolbar-card sticky top-0 z-10 mb-5 rounded-xl border border-border-subtle bg-surface-card px-2 py-1.5">
           <EditorToolbar editor={editor} />
         </div>
       )}
 
-      <DocumentCard width={pageWidth}>
+      <DocumentCard width={pageWidth} layout={pageLayout} paper={paperSize} fontSize={fontSize}>
         <DocumentTitleInput documentId={document.id} initialTitle={document.title} />
-        <hr className="mt-6 mb-8 border-border-subtle" />
-        <div className="flex-1">
+        <hr className="mt-6 mb-8 border-border-subtle print-hidden" />
+        <div className="editor-body flex-1">
           <DocumentEditor editor={editor} />
         </div>
         {editor && <WordCountPill editor={editor} />}

@@ -44,7 +44,7 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
   };
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border-subtle bg-surface-app px-4">
+    <header className="app-topbar flex h-16 shrink-0 items-center gap-2 border-b border-border-subtle bg-surface-app px-4">
       {!isSidebarOpen && (
         <IconButton aria-label="Expand sidebar" onClick={onToggleSidebar}>
           <PanelLeft className="size-4" aria-hidden />
