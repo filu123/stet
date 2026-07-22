@@ -1,26 +1,301 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ---------------------------------------------------------------------------
+ * Design tokens — Craft.do-inspired system (see plan.md § Design direction)
+ *
+ * Rules (see AGENTS.md):
+ * - Components use ONLY these tokens (via Tailwind theme colors below).
+ * - No raw hex values inside components.
+ * - Dark mode is expressed here, never per-component.
+ * ------------------------------------------------------------------------- */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  /* Surfaces — soft gray app shell, floating white document card */
+  --surface-app: #f7f7f7;
+  --surface-card: #ffffff;
+  --surface-sidebar: #ececea;
+  --surface-hover: rgba(0, 0, 0, 0.045);
+  --surface-callout: #f5f5f4;
+
+  /* Text */
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #a1a1a6;
+
+  /* Lines & chrome */
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --accent: #0a7cff;
+  --selection: rgba(10, 124, 255, 0.18);
+  --danger: #e0453a;
+  --overlay: rgba(0, 0, 0, 0.25);
+
+  /* Highlight pills (Craft-style inline chips) & AI markup colors */
+  --pill-yellow-bg: #fdf1a7;
+  --pill-green-bg: #c9ecd4;
+  --pill-blue-bg: #cfe5fb;
+  --pill-purple-bg: #e4d8f9;
+  --pill-red-bg: #fbd3d0;
+
+  /* AI markup semantics */
+  --ai-grammar: #e4574d;   /* wavy underline: grammar issues */
+  --ai-style: #b98a00;     /* highlight: style/clarity suggestions */
+  --ai-circle: #0a7cff;    /* circled/annotated ranges */
+
+  /* Document card — subtle rounding, docx-like (owner preference: not too round) */
+  --card-radius: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --surface-app: #1c1c1e;
+    --surface-card: #242426;
+    --surface-sidebar: #202022;
+    --surface-hover: rgba(255, 255, 255, 0.06);
+    --surface-callout: #2c2c2e;
+
+    --text-primary: #f2f2f7;
+    --text-secondary: #98989f;
+    --text-tertiary: #636368;
+
+    --border-subtle: rgba(255, 255, 255, 0.1);
+    --accent: #409cff;
+    --selection: rgba(64, 156, 255, 0.35);
+    --danger: #ff6b61;
+    --overlay: rgba(0, 0, 0, 0.5);
+
+    --pill-yellow-bg: #5c521c;
+    --pill-green-bg: #274a33;
+    --pill-blue-bg: #1f3a55;
+    --pill-purple-bg: #3d2f57;
+    --pill-red-bg: #55292a;
+
+    --ai-grammar: #ff6b61;
+    --ai-style: #e0b341;
+    --ai-circle: #409cff;
   }
 }
 
+@theme inline {
+  /* Expose tokens to Tailwind: bg-surface-card, text-content-secondary, etc. */
+  --color-surface-app: var(--surface-app);
+  --color-surface-card: var(--surface-card);
+  --color-surface-sidebar: var(--surface-sidebar);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-callout: var(--surface-callout);
+
+  --color-content-primary: var(--text-primary);
+  --color-content-secondary: var(--text-secondary);
+  --color-content-tertiary: var(--text-tertiary);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-overlay: var(--overlay);
+
+  --color-pill-yellow: var(--pill-yellow-bg);
+  --color-pill-green: var(--pill-green-bg);
+  --color-pill-blue: var(--pill-blue-bg);
+  --color-pill-purple: var(--pill-purple-bg);
+  --color-pill-red: var(--pill-red-bg);
+
+  --color-ai-grammar: var(--ai-grammar);
+  --color-ai-style: var(--ai-style);
+  --color-ai-circle: var(--ai-circle);
+
+  --radius-card: var(--card-radius);
+
+  /* Widths — `max-w-document` = the floating page surface */
+  --container-document: 45rem;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface-app);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+/* Gentle pop-in for dialogs (Craft-style micro-animation, no shadows) */
+@keyframes dialog-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+.dialog-pop {
+  animation: dialog-pop 150ms ease-out;
+}
+
+@keyframes overlay-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.overlay-fade {
+  animation: overlay-fade 150ms ease-out;
+}
+
+/* ---------------------------------------------------------------------------
+ * Editor content typography (TipTap renders plain elements — element selectors
+ * are unavoidable here; all values come from design tokens).
+ * ------------------------------------------------------------------------- */
+
+.tiptap-content {
+  font-size: 1.0625rem; /* 17px — Craft-like reading size */
+  line-height: 1.75;
+  color: var(--text-primary);
+  caret-color: var(--accent);
+}
+
+.tiptap-content > * + * {
+  margin-top: 0.75em;
+}
+
+.tiptap-content h1,
+.tiptap-content h2,
+.tiptap-content h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin-top: 1.6em;
+}
+
+.tiptap-content h1 {
+  font-size: 1.75rem;
+}
+
+.tiptap-content h2 {
+  font-size: 1.375rem;
+}
+
+.tiptap-content h3 {
+  font-size: 1.125rem;
+}
+
+.tiptap-content ul,
+.tiptap-content ol {
+  padding-left: 1.5rem;
+}
+
+.tiptap-content ul {
+  list-style: disc;
+}
+
+.tiptap-content ol {
+  list-style: decimal;
+}
+
+.tiptap-content li + li {
+  margin-top: 0.25em;
+}
+
+.tiptap-content li::marker {
+  color: var(--text-tertiary);
+}
+
+.tiptap-content blockquote {
+  border-left: 3px solid var(--border-subtle);
+  padding-left: 1rem;
+  color: var(--text-secondary);
+}
+
+.tiptap-content code {
+  background: var(--surface-callout);
+  border-radius: 5px;
+  padding: 0.15em 0.4em;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.875em;
+}
+
+.tiptap-content pre {
+  background: var(--surface-callout);
+  border-radius: 10px;
+  padding: 0.875rem 1rem;
+  overflow-x: auto;
+}
+
+.tiptap-content pre code {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  font-size: 0.85em;
+}
+
+.tiptap-content hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 2rem 0;
+}
+
+.tiptap-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tiptap-content strong {
+  font-weight: 600;
+}
+
+/* Highlights render as Craft-style pills; background color comes from the
+   highlight mark's token value (dark-mode aware automatically) */
+.tiptap-content mark {
+  color: inherit;
+  border-radius: 5px;
+  padding: 0.1em 0.3em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* AI markup — rendered as ProseMirror decorations (never document content).
+   One class per suggestion kind; all clickable to open the suggestion popover. */
+.ai-markup {
+  cursor: pointer;
+}
+
+.ai-markup-grammar {
+  text-decoration: underline wavy var(--ai-grammar);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+.ai-markup-style {
+  text-decoration: underline wavy var(--ai-style);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+.ai-markup-highlight {
+  background: var(--pill-yellow-bg);
+  border-radius: 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.ai-markup-circle {
+  border: 1.5px solid var(--ai-circle);
+  border-radius: 10px;
+  padding: 0.05em 0.2em;
+  margin: 0 1px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* Placeholder text for an empty document (via @tiptap/extension-placeholder) */
+.tiptap-content p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--text-tertiary);
 }
