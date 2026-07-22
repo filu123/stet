@@ -68,6 +68,17 @@ export function AiBubbleMenuActions({ editor }: AiBubbleMenuActionsProps) {
     try {
       const replacement = await requestRewrite(selectedText, action, settings, apiKey);
 
+      // The model returned the text unchanged → honestly say so instead of
+      // pretending there's something to accept.
+      if (replacement.trim() === selectedText.trim()) {
+        store.failReview(
+          action === "fix"
+            ? "Nothing to fix — this text is already correct. ✓"
+            : "No changes suggested — this text looks good as it is. ✓",
+        );
+        return;
+      }
+
       // The user may have edited while we waited — never mark stale positions.
       if (editor.state.doc.textBetween(from, to, "\n") !== selectedText) {
         store.failReview("The text changed while rewriting — select it and try again.");

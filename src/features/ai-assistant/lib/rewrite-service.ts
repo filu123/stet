@@ -6,13 +6,14 @@ export type RewriteAction = "improve" | "shorten" | "expand" | "fix";
 
 const REWRITE_SYSTEM_PROMPT = `You are a writing assistant. You rewrite a snippet of the user's text.
 Reply ONLY with the rewritten text — no quotes around it, no commentary, no markdown fences.
-Keep the same language, person, and tense as the original unless the instruction says otherwise.`;
+Keep the same language, person, and tense as the original unless the instruction says otherwise.
+IMPORTANT: If the instruction doesn't genuinely apply — the text already satisfies it and any change would be change for its own sake — return the original text EXACTLY as given, character for character. Never invent improvements.`;
 
 const ACTION_INSTRUCTIONS: Record<RewriteAction, string> = {
-  improve: "Rewrite this text to be clearer and more polished. Keep the meaning and roughly the same length.",
-  shorten: "Rewrite this text to be significantly more concise while preserving the full meaning.",
+  improve: "Rewrite this text to be clearer and more polished. Keep the meaning and roughly the same length. If it is already clear and well written, return it unchanged.",
+  shorten: "Rewrite this text to be significantly more concise while preserving the full meaning. If it is already as concise as it can be, return it unchanged.",
   expand: "Expand this text with more detail and depth, staying in the same voice.",
-  fix: "Fix ONLY grammar, spelling, and punctuation errors. Keep the wording and style otherwise identical.",
+  fix: "Fix ONLY grammar, spelling, and punctuation errors. Keep the wording and style otherwise identical. If there are no errors, return the text unchanged — do not rephrase anything.",
 };
 
 export const ACTION_NOTES: Record<RewriteAction, string> = {

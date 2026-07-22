@@ -27,6 +27,7 @@ import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 
 import { HIGHLIGHT_COLORS } from "../lib/highlight-colors";
 import { MarkColorSwatches } from "./MarkColorSwatches";
+import { PageWidthControl } from "./PageWidthControl";
 
 interface EditorToolbarProps {
   editor: Editor;
@@ -163,6 +164,11 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
           />
         </ToolbarButton>
       ))}
+
+      <div className="ml-auto flex items-center gap-0.5 pl-2">
+        <ToolbarDivider />
+        <PageWidthControl />
+      </div>
     </div>
   );
 }

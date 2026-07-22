@@ -4,6 +4,7 @@ import { DocumentCard } from "@/components/ui/DocumentCard";
 import { Toast } from "@/components/ui/Toast";
 import { AiAssistantButton, SuggestionPopover, useProactiveReview } from "@/features/ai-assistant";
 import { DocumentTitleInput } from "@/features/documents";
+import { useUiPreferencesStore } from "@/stores/ui-preferences-store";
 import type { EditorDocument } from "@/types/document";
 
 import { DocumentEditor } from "./DocumentEditor";
@@ -27,6 +28,7 @@ export function EditorScreen({ document }: EditorScreenProps) {
   useAutosaveDocument(editor, document.id);
   useProactiveReview(editor);
   const isSaveToastVisible = useSaveShortcutToast();
+  const pageWidth = useUiPreferencesStore((state) => state.pageWidth);
 
   return (
     <>
@@ -36,7 +38,7 @@ export function EditorScreen({ document }: EditorScreenProps) {
         </div>
       )}
 
-      <DocumentCard>
+      <DocumentCard width={pageWidth}>
         <DocumentTitleInput documentId={document.id} initialTitle={document.title} />
         <hr className="mt-6 mb-8 border-border-subtle" />
         <div className="flex-1">
