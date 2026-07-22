@@ -2,6 +2,7 @@
 
 import {
   Bold,
+  Circle,
   Code,
   Heading1,
   Heading2,
@@ -9,6 +10,7 @@ import {
   List,
   Strikethrough,
   TextQuote,
+  Underline,
   X,
 } from "lucide-react";
 import { useEditorState, type Editor } from "@tiptap/react";
@@ -18,17 +20,11 @@ import { ToolbarButton } from "@/components/ui/ToolbarButton";
 import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 import { AiBubbleMenuActions } from "@/features/ai-assistant";
 
+import { HIGHLIGHT_COLORS } from "../lib/highlight-colors";
+
 interface FormattingBubbleMenuProps {
   editor: Editor;
 }
-
-/** The four Craft-style highlight pills (values are theme tokens, dark-mode aware). */
-const HIGHLIGHT_COLORS = [
-  { name: "yellow", cssValue: "var(--pill-yellow-bg)" },
-  { name: "green", cssValue: "var(--pill-green-bg)" },
-  { name: "blue", cssValue: "var(--pill-blue-bg)" },
-  { name: "purple", cssValue: "var(--pill-purple-bg)" },
-] as const;
 
 /**
  * Craft-style floating formatting menu — appears over selected text.
@@ -41,6 +37,8 @@ export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
       isBold: editorInstance.isActive("bold"),
       isItalic: editorInstance.isActive("italic"),
       isStrike: editorInstance.isActive("strike"),
+      isUnderline: editorInstance.isActive("underline"),
+      isCircle: editorInstance.isActive("circle"),
       isCode: editorInstance.isActive("code"),
       isHeading1: editorInstance.isActive("heading", { level: 1 }),
       isHeading2: editorInstance.isActive("heading", { level: 2 }),
@@ -73,6 +71,20 @@ export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
           onClick={() => editor.chain().focus().toggleStrike().run()}
         >
           <Strikethrough className="size-3.5" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
+          label="Underline"
+          isActive={activeStates.isUnderline}
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+        >
+          <Underline className="size-3.5" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
+          label="Circle text"
+          isActive={activeStates.isCircle}
+          onClick={() => editor.chain().focus().toggleCircle().run()}
+        >
+          <Circle className="size-3.5 text-ai-circle" aria-hidden />
         </ToolbarButton>
         <ToolbarButton
           label="Inline code"

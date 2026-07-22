@@ -42,9 +42,10 @@ const markdownSerializer = new MarkdownSerializer(
     code: defaultMarkdownSerializer.marks.code,
     link: defaultMarkdownSerializer.marks.link,
     strike: { open: "~~", close: "~~", mixable: true, expelEnclosingWhitespace: true },
-    // Markdown has no highlight/underline syntax — content passes through unformatted.
+    // Markdown has no highlight/underline/circle syntax — these pass through unformatted.
     highlight: { open: "==", close: "==", mixable: true, expelEnclosingWhitespace: true },
     underline: { open: "", close: "", mixable: true },
+    circle: { open: "", close: "", mixable: true },
   },
 );
 

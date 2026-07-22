@@ -257,6 +257,16 @@ body {
   -webkit-box-decoration-break: clone;
 }
 
+/* User-applied circled text (a real mark, unlike AI decorations) */
+.tiptap-content .user-circle {
+  border: 1.5px solid var(--ai-circle);
+  border-radius: 10px;
+  padding: 0.05em 0.2em;
+  margin: 0 1px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 /* AI markup — rendered as ProseMirror decorations (never document content).
    One class per suggestion kind; all clickable to open the suggestion popover. */
 .ai-markup {
