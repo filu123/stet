@@ -12,8 +12,11 @@ import { Decoration, DecorationSet, type EditorView } from "@tiptap/pm/view";
 /** Usable content height per sheet at 96dpi (paper minus page margins). */
 export const PAPER_CONTENT_HEIGHTS = { a4: 987, letter: 920 } as const;
 
-/** Visual gap between sheets (includes next page's breathing room). */
-export const PAGE_GAP_HEIGHT = 56;
+/** The gray band between sheets. */
+export const PAGE_GAP_HEIGHT = 48;
+
+/** White breathing room at the top of each new sheet. */
+const PAGE_TOP_PADDING = 44;
 
 interface PageViewConfig {
   pageHeight: number;
@@ -22,7 +25,9 @@ interface PageViewConfig {
 
 interface PageSpacer {
   pos: number;
-  height: number;
+  /** White space finishing the current sheet (varies per page). */
+  fillerHeight: number;
+  gapHeight: number;
 }
 
 interface PageViewState {
@@ -89,23 +94,37 @@ function createSpacerDecorations(doc: import("@tiptap/pm/model").Node, spacers: 
       Decoration.widget(
         spacer.pos,
         () => {
+          // Three stacked zones: white remainder of the current sheet,
+          // the gray between-sheets band, white top margin of the next sheet.
           const element = document.createElement("div");
           element.className = "page-gap";
-          element.style.height = `${spacer.height}px`;
           element.contentEditable = "false";
+
+          const filler = document.createElement("div");
+          filler.style.height = `${spacer.fillerHeight}px`;
+
+          const band = document.createElement("div");
+          band.className = "page-gap-band";
+          band.style.height = `${spacer.gapHeight}px`;
+
+          const topPadding = document.createElement("div");
+          topPadding.style.height = `${PAGE_TOP_PADDING}px`;
+
+          element.append(filler, band, topPadding);
           return element;
         },
-        { side: -1, key: `page-gap-${spacer.pos}-${spacer.height}` },
+        { side: -1, key: `page-gap-${spacer.pos}-${spacer.fillerHeight}` },
       ),
     ),
   );
 }
 
 /**
- * Measures block heights after each render (debounced) and recomputes the
- * spacer list. Measurement uses each block's OWN height — independent of any
- * existing spacers — so the loop is stable: identical results are never
- * re-dispatched.
+ * Measures REAL layout positions after each render (debounced) and recomputes
+ * the spacer list. Each block's natural position = its rendered position minus
+ * the spacers above it — exact regardless of document length (no accumulated
+ * rounding or margin-collapse drift), and independent of the spacers
+ * themselves, so the loop is stable: identical results are never re-dispatched.
  */
 class PageViewController {
   private isScheduled = false;
@@ -142,42 +161,49 @@ class PageViewController {
     }
     const { pageHeight, gapHeight } = pluginState.config;
 
-    // Top-level DOM blocks (minus our own gap widgets) ↔ top-level doc nodes.
-    const blockElements = Array.from(view.dom.children).filter(
-      (element) => !element.classList.contains("page-gap"),
-    ) as HTMLElement[];
+    // Map top-level doc nodes to their positions.
     const blockPositions: number[] = [];
     let scanPos = 0;
     view.state.doc.forEach((node) => {
       blockPositions.push(scanPos);
       scanPos += node.nodeSize;
     });
-    if (blockElements.length !== blockPositions.length) return; // DOM mid-update; next pass will run
+    const domChildren = Array.from(view.dom.children) as HTMLElement[];
+    const blockCount = domChildren.filter((el) => !el.classList.contains("page-gap")).length;
+    if (blockCount !== blockPositions.length) return; // DOM mid-update; next pass will run
 
+    const domTop = view.dom.getBoundingClientRect().top;
     const spacers: PageSpacer[] = [];
-    let contentY = 0;
+    let spacersHeightAbove = 0;
     let pageBoundary = pageHeight;
-    blockElements.forEach((element, index) => {
-      const style = window.getComputedStyle(element);
-      const blockHeight =
-        element.offsetHeight +
-        (parseFloat(style.marginTop) || 0) +
-        (parseFloat(style.marginBottom) || 0);
+    let blockIndex = 0;
 
-      const crossesBoundary = contentY + blockHeight > pageBoundary && contentY > 0;
-      const fitsOnAPage = blockHeight <= pageHeight;
-      if (crossesBoundary && fitsOnAPage) {
-        spacers.push({
-          pos: blockPositions[index],
-          height: Math.round(pageBoundary - contentY + gapHeight),
-        });
-        contentY = pageBoundary + gapHeight;
-        pageBoundary = contentY + pageHeight;
+    for (const element of domChildren) {
+      if (element.classList.contains("page-gap")) {
+        spacersHeightAbove += element.offsetHeight;
+        continue;
       }
-      contentY += blockHeight;
-      // A block taller than a page just flows; advance the boundary past it.
-      while (contentY > pageBoundary) pageBoundary += pageHeight;
-    });
+      const rect = element.getBoundingClientRect();
+      const naturalTop = rect.top - domTop - spacersHeightAbove;
+      const naturalBottom = naturalTop + rect.height;
+      const pos = blockPositions[blockIndex];
+      blockIndex++;
+
+      if (naturalBottom > pageBoundary) {
+        if (naturalTop > 0 && rect.height <= pageHeight) {
+          // Push this block to the top of a new sheet.
+          spacers.push({
+            pos,
+            fillerHeight: Math.max(0, Math.round(pageBoundary - naturalTop)),
+            gapHeight,
+          });
+          pageBoundary = naturalTop + pageHeight;
+        } else {
+          // Taller than a page (or the very first block): let it flow.
+          while (naturalBottom > pageBoundary) pageBoundary += pageHeight;
+        }
+      }
+    }
 
     this.dispatchSpacers(spacers);
   }

@@ -431,11 +431,15 @@ body {
 }
 
 .tiptap-content .page-gap {
+  pointer-events: none;
+}
+
+/* Only the band is gray — the filler above and padding below stay page-white */
+.tiptap-content .page-gap .page-gap-band {
   margin: 0 calc(-1 * var(--card-pad-x));
   background: var(--surface-app);
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
-  pointer-events: none;
 }
 
 /* Editor text size setting */
