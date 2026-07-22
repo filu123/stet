@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Open Source AI Editor",
+  title: "Stet",
   description:
-    "Open source, local-first document editor with an AI writing assistant.",
+    "Stet — an open source, local-first document editor with an AI that marks up your writing like a human editor.",
 };
 
 export default function RootLayout({

@@ -1,5 +1,3 @@
-import { FileText } from "lucide-react";
-
 import { cn } from "@/lib/utils/cn";
 import { SidebarDocumentList } from "@/features/documents";
 
@@ -20,8 +18,17 @@ export function Sidebar({ isOpen }: SidebarProps) {
       {/* Fixed-width inner column so content doesn't squish during the collapse animation */}
       <div className="flex h-full w-64 flex-col border-r border-border-subtle">
         <header className="flex h-12 shrink-0 items-center gap-2 px-4">
-          <FileText className="size-4 text-content-secondary" aria-hidden />
-          <span className="truncate text-sm font-semibold">Open Source AI Editor</span>
+          {/* The squiggle — Stet's brand mark (an editor's wavy underline) */}
+          <svg viewBox="0 0 24 8" className="h-2 w-6 text-ai-grammar" aria-hidden>
+            <path
+              d="M1 5 Q 3.5 1, 6 5 T 11 5 T 16 5 T 21 5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+          <span className="truncate text-sm font-semibold">Stet</span>
         </header>
 
         <SidebarDocumentList />

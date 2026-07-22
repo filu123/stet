@@ -108,6 +108,8 @@ The differentiator. A small floating AI icon in the editor.
 
 ## 7. Decisions made during build
 
+- **The app is named "Stet"** — the proofreader's mark meaning "let it stand", mirroring the accept/dismiss suggestion loop at the heart of the app. The red **squiggle** (editor's wavy underline) is the brand mark/logo. Internal storage keys (IndexedDB name, localStorage keys) keep their old identifiers until a 1.0 migration — renaming them would orphan existing local documents.
+
 - **Document titles** are edited inline in the document header (an input styled as the h1). The first heading in the content is NOT auto-promoted to title — title and content are independent. (Step 4)
 - **Two formatting surfaces**: a fixed docx-style toolbar (sticky above the document, Google Docs-like) AND the selection bubble menu. Both flat, no shadows. (Step 5.5)
 - **Card radius reduced to 8px** — owner found 14px too round; the docx-editor look is the reference. (Step 5.5)
