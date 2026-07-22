@@ -1,10 +1,10 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 
 import { useSaveStatusStore } from "@/stores/save-status-store";
 
-/** Subtle autosave state readout for the TopBar: "Saving…" → "Saved". */
+/** Subtle autosave state readout for the TopBar: "Saving…" → "Saved just now". */
 export function SaveStatusIndicator() {
   const status = useSaveStatusStore((state) => state.status);
 
@@ -17,11 +17,14 @@ export function SaveStatusIndicator() {
     >
       {status === "saving" ? (
         <>
-          <Loader2 className="size-3 animate-spin" aria-hidden />
+          <Loader2 className="size-3.5 animate-spin" aria-hidden />
           Saving…
         </>
       ) : (
-        "Saved"
+        <>
+          <CheckCircle2 className="size-3.5 text-accent" aria-hidden />
+          Saved just now
+        </>
       )}
     </span>
   );

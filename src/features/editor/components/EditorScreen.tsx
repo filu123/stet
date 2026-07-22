@@ -8,6 +8,7 @@ import type { EditorDocument } from "@/types/document";
 
 import { DocumentEditor } from "./DocumentEditor";
 import { EditorToolbar } from "./EditorToolbar";
+import { WordCountPill } from "./WordCountPill";
 import { useAutosaveDocument } from "../hooks/useAutosaveDocument";
 import { useDocumentEditor } from "../hooks/useDocumentEditor";
 import { useSaveShortcutToast } from "../hooks/useSaveShortcutToast";
@@ -30,17 +31,18 @@ export function EditorScreen({ document }: EditorScreenProps) {
   return (
     <>
       {editor && (
-        <div className="sticky top-0 z-10 -mx-4 mb-6 border-y border-border-subtle bg-surface-card px-4 py-1 sm:-mx-8 sm:px-8">
-          <div className="mx-auto w-full max-w-document">
-            <EditorToolbar editor={editor} />
-          </div>
+        <div className="sticky top-0 z-10 mb-5 rounded-xl border border-border-subtle bg-surface-card px-2 py-1.5">
+          <EditorToolbar editor={editor} />
         </div>
       )}
 
       <DocumentCard>
         <DocumentTitleInput documentId={document.id} initialTitle={document.title} />
-        <hr className="mt-5 mb-7 border-border-subtle" />
-        <DocumentEditor editor={editor} />
+        <hr className="mt-6 mb-8 border-border-subtle" />
+        <div className="flex-1">
+          <DocumentEditor editor={editor} />
+        </div>
+        {editor && <WordCountPill editor={editor} />}
       </DocumentCard>
 
       {editor && (

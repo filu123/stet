@@ -34,7 +34,7 @@ export function DocumentTitleInput({ documentId, initialTitle }: DocumentTitleIn
       }}
       aria-label="Document title"
       placeholder="Untitled"
-      className="w-full bg-transparent text-3xl font-semibold tracking-tight placeholder:text-content-tertiary focus:outline-none"
+      className="w-full bg-transparent text-4xl font-bold tracking-tight placeholder:text-content-tertiary focus:outline-none"
     />
   );
 }

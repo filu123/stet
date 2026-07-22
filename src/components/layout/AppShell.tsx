@@ -16,11 +16,11 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="flex h-dvh bg-surface-app">
-      <Sidebar isOpen={isSidebarOpen} />
+      <Sidebar isOpen={isSidebarOpen} onToggle={handleToggleSidebar} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <TopBar isSidebarOpen={isSidebarOpen} onToggleSidebar={handleToggleSidebar} />
-        <main className="flex-1 overflow-y-auto px-4 pb-12 sm:px-8">{children}</main>
+        <main className="flex-1 overflow-y-auto px-4 pt-4 pb-12 sm:px-8">{children}</main>
       </div>
     </div>
   );

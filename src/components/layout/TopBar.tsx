@@ -2,7 +2,8 @@
 
 import { useRef, useState, type ChangeEvent } from "react";
 
-import { Download, Folder, PanelLeft, Settings, Upload } from "lucide-react";
+import { ChevronRight, Download, House, PanelLeft, Settings, Upload } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { IconButton } from "@/components/ui/IconButton";
@@ -43,36 +44,50 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
   };
 
   return (
-    <header className="grid h-12 shrink-0 grid-cols-[1fr_auto_1fr] items-center px-2">
-      <div className="justify-self-start">
-        <IconButton
-          aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-          aria-expanded={isSidebarOpen}
-          onClick={onToggleSidebar}
-        >
+    <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border-subtle bg-surface-app px-4">
+      {!isSidebarOpen && (
+        <IconButton aria-label="Expand sidebar" onClick={onToggleSidebar}>
           <PanelLeft className="size-4" aria-hidden />
         </IconButton>
-      </div>
+      )}
 
-      {/* Centered breadcrumb, Craft-style */}
+      {/* Breadcrumb */}
       <nav
         aria-label="Breadcrumb"
-        className="flex items-center gap-1.5 text-sm text-content-tertiary"
+        className="flex min-w-0 flex-1 items-center gap-1.5 text-sm text-content-tertiary"
       >
-        <Folder className="size-3.5" aria-hidden />
+        <Link
+          href="/"
+          aria-label="Home"
+          className="flex size-7 items-center justify-center rounded-lg transition-colors hover:bg-surface-hover hover:text-content-primary"
+        >
+          <House className="size-4" aria-hidden />
+        </Link>
+        <ChevronRight className="size-3.5 shrink-0" aria-hidden />
         <span>Documents</span>
         {document && (
           <>
-            <span aria-hidden>/</span>
-            <span className="max-w-64 truncate font-medium text-content-secondary">
+            <ChevronRight className="size-3.5 shrink-0" aria-hidden />
+            <span className="max-w-56 truncate font-medium text-content-primary">
               {document.title}
             </span>
           </>
         )}
       </nav>
 
-      <div className="flex items-center gap-1 justify-self-end pr-1">
+      <div className="flex shrink-0 items-center gap-2">
         <SaveStatusIndicator />
+
+        {document && (
+          <button
+            type="button"
+            onClick={() => exportDocumentAsMarkdown(document)}
+            className="flex h-9 items-center gap-1.5 rounded-lg border border-border-subtle bg-surface-card px-3 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-hover hover:text-content-primary"
+          >
+            <Download className="size-3.5" aria-hidden />
+            Export
+          </button>
+        )}
         <IconButton
           aria-label="Import Markdown file"
           title="Import Markdown file"
@@ -80,15 +95,6 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
         >
           <Upload className="size-4" aria-hidden />
         </IconButton>
-        {document && (
-          <IconButton
-            aria-label="Export as Markdown"
-            title="Export as Markdown"
-            onClick={() => exportDocumentAsMarkdown(document)}
-          >
-            <Download className="size-4" aria-hidden />
-          </IconButton>
-        )}
         <IconButton
           aria-label="AI settings"
           title="AI settings"

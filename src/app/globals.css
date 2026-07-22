@@ -10,24 +10,25 @@
  * ------------------------------------------------------------------------- */
 
 :root {
-  /* Surfaces — soft gray app shell, floating white document card */
-  --surface-app: #f7f7f7;
+  /* Surfaces — cool near-white shell, white sidebar and document card */
+  --surface-app: #f5f6fb;
   --surface-card: #ffffff;
-  --surface-sidebar: #ececea;
-  --surface-hover: rgba(0, 0, 0, 0.045);
-  --surface-callout: #f5f5f4;
+  --surface-sidebar: #ffffff;
+  --surface-hover: rgba(15, 23, 42, 0.05);
+  --surface-callout: #f4f5f9;
 
   /* Text */
-  --text-primary: #1d1d1f;
-  --text-secondary: #6e6e73;
-  --text-tertiary: #a1a1a6;
+  --text-primary: #171923;
+  --text-secondary: #5d6470;
+  --text-tertiary: #9aa1ad;
 
   /* Lines & chrome */
-  --border-subtle: rgba(0, 0, 0, 0.08);
-  --accent: #0a7cff;
-  --selection: rgba(10, 124, 255, 0.18);
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --accent: #4f46e5;
+  --accent-soft: rgba(79, 70, 229, 0.09);
+  --selection: rgba(79, 70, 229, 0.18);
   --danger: #e0453a;
-  --overlay: rgba(0, 0, 0, 0.25);
+  --overlay: rgba(15, 23, 42, 0.3);
 
   /* Highlight pills (Craft-style inline chips) & AI markup colors */
   --pill-yellow-bg: #fdf1a7;
@@ -48,27 +49,28 @@
   --mark-green: #1f9e54;
   --mark-purple: #7c4dff;
 
-  /* Document card — subtle rounding, docx-like (owner preference: not too round) */
-  --card-radius: 8px;
+  /* Document card */
+  --card-radius: 12px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface-app: #1c1c1e;
-    --surface-card: #242426;
-    --surface-sidebar: #202022;
+    --surface-app: #131419;
+    --surface-card: #1c1d24;
+    --surface-sidebar: #17181f;
     --surface-hover: rgba(255, 255, 255, 0.06);
-    --surface-callout: #2c2c2e;
+    --surface-callout: #262731;
 
-    --text-primary: #f2f2f7;
-    --text-secondary: #98989f;
-    --text-tertiary: #636368;
+    --text-primary: #f0f1f6;
+    --text-secondary: #9aa0ad;
+    --text-tertiary: #646a76;
 
     --border-subtle: rgba(255, 255, 255, 0.1);
-    --accent: #409cff;
-    --selection: rgba(64, 156, 255, 0.35);
+    --accent: #837dff;
+    --accent-soft: rgba(131, 125, 255, 0.14);
+    --selection: rgba(131, 125, 255, 0.35);
     --danger: #ff6b61;
-    --overlay: rgba(0, 0, 0, 0.5);
+    --overlay: rgba(0, 0, 0, 0.55);
 
     --pill-yellow-bg: #5c521c;
     --pill-green-bg: #274a33;
@@ -102,6 +104,7 @@
 
   --color-border-subtle: var(--border-subtle);
   --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
   --color-danger: var(--danger);
   --color-overlay: var(--overlay);
 
