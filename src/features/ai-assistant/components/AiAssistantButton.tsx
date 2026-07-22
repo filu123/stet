@@ -14,6 +14,7 @@ import { addAiMarkup, clearAiMarkup, showAiMarkup } from "../lib/ai-markup-exten
 import { buildDocumentTextIndex, resolveQuoteRange } from "../lib/position-mapper";
 import { requestDocumentReview } from "../lib/review-service";
 import { requestContinuation } from "../lib/rewrite-service";
+import { AiActionMenu } from "./AiActionMenu";
 
 interface AiAssistantButtonProps {
   editor: Editor;
@@ -24,6 +25,7 @@ export function AiAssistantButton({ editor }: AiAssistantButtonProps) {
   const { phase, errorMessage, suggestions, isProactiveChecking } = useAiReviewStore();
   const clearReview = useAiReviewStore((state) => state.clearReview);
   const [isContinuing, setIsContinuing] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Fresh document (component remounts per doc) → no stale review state.
   useEffect(() => {
@@ -163,24 +165,38 @@ export function AiAssistantButton({ editor }: AiAssistantButtonProps) {
         )}
       </button>
 
-      <button
-        type="button"
-        aria-label="Review document with AI"
-        title="Review document with AI"
-        onClick={() => void handleReviewClick()}
-        disabled={phase === "reviewing"}
-        className={cn(
-          "flex size-12 items-center justify-center rounded-full bg-accent text-white",
-          "transition-transform hover:scale-105 active:scale-95",
-          phase === "reviewing" && "opacity-70",
+      <div className="relative">
+        <button
+          type="button"
+          aria-label="AI assistant"
+          title="AI assistant"
+          aria-expanded={isMenuOpen}
+          onClick={() => setIsMenuOpen((current) => !current)}
+          disabled={phase === "reviewing"}
+          className={cn(
+            "flex size-12 items-center justify-center rounded-full bg-accent text-white",
+            "transition-transform hover:scale-105 active:scale-95",
+            phase === "reviewing" && "opacity-70",
+          )}
+        >
+          {phase === "reviewing" ? (
+            <Loader2 className="size-5 animate-spin" aria-hidden />
+          ) : (
+            <Sparkles className="size-5" aria-hidden />
+          )}
+        </button>
+
+        {isMenuOpen && (
+          <>
+            <div className="fixed inset-0 z-30" aria-hidden onClick={() => setIsMenuOpen(false)} />
+            <AiActionMenu
+              editor={editor}
+              onAnalyze={() => void handleReviewClick()}
+              onClose={() => setIsMenuOpen(false)}
+            />
+          </>
         )}
-      >
-        {phase === "reviewing" ? (
-          <Loader2 className="size-5 animate-spin" aria-hidden />
-        ) : (
-          <Sparkles className="size-5" aria-hidden />
-        )}
-      </button>
+      </div>
     </div>
   );
 }

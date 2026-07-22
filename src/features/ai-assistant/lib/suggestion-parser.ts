@@ -31,7 +31,7 @@ export function parseReviewResponse(modelOutput: string): RawSuggestion[] {
 }
 
 /** The outermost [...] span — survives ```json fences and stray prose. */
-function extractJsonArray(modelOutput: string): string | null {
+export function extractJsonArray(modelOutput: string): string | null {
   const start = modelOutput.indexOf("[");
   const end = modelOutput.lastIndexOf("]");
   if (start === -1 || end === -1 || end <= start) return null;
