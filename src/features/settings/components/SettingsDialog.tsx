@@ -6,7 +6,9 @@ import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { cn } from "@/lib/utils/cn";
+import { THEMES } from "@/lib/themes";
 import { useSettingsStore } from "@/stores/settings-store";
+import { useUiPreferencesStore } from "@/stores/ui-preferences-store";
 import type { AiAssistantMode, AiProvider } from "@/types/ai";
 
 import { clearApiKey, maskApiKey, readApiKey, writeApiKey } from "../lib/api-key-storage";
@@ -35,6 +37,8 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
 function SettingsDialogForm({ onClose }: { onClose: () => void }) {
   const updateSettings = useSettingsStore((state) => state.updateSettings);
+  const activeTheme = useUiPreferencesStore((state) => state.theme);
+  const setTheme = useUiPreferencesStore((state) => state.setTheme);
 
   const [provider, setProvider] = useState<AiProvider>(() => useSettingsStore.getState().provider);
   const [model, setModel] = useState(() => useSettingsStore.getState().model);
@@ -108,6 +112,41 @@ function SettingsDialogForm({ onClose }: { onClose: () => void }) {
         </p>
 
         <div className="mt-5 flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-medium text-content-secondary">
+              Theme <span className="font-normal text-content-tertiary">(applies instantly)</span>
+            </span>
+            <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Theme">
+              {THEMES.map((themeInfo) => (
+                <button
+                  key={themeInfo.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={themeInfo.id === activeTheme}
+                  onClick={() => setTheme(themeInfo.id)}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors",
+                    themeInfo.id === activeTheme
+                      ? "border-accent text-accent"
+                      : "border-border-subtle text-content-secondary hover:bg-surface-hover",
+                  )}
+                >
+                  <span
+                    className="size-3.5 rounded-full border border-border-subtle"
+                    style={{ background: themeInfo.previewBackground }}
+                    aria-hidden
+                  >
+                    <span
+                      className="mt-[3px] ml-[3px] block size-1.5 rounded-full"
+                      style={{ background: themeInfo.previewAccent }}
+                    />
+                  </span>
+                  {themeInfo.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-content-secondary">Provider</span>
             <SegmentedControl

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { ThemeApplier } from "@/components/layout/ThemeApplier";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -18,6 +20,12 @@ export const metadata: Metadata = {
     "Stet — an open source, local-first document editor with an AI that marks up your writing like a human editor.",
 };
 
+/**
+ * Sets data-theme before first paint so a dark/sepia user never sees a light
+ * flash. Must stay in sync with resolveThemeAttribute in lib/themes.ts.
+ */
+const THEME_INIT_SCRIPT = `(function(){try{var s=JSON.parse(localStorage.getItem("editor-ui-preferences")||"{}").state||{};var t=s.theme||"system";if(t==="system"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme="light"}})()`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,9 +34,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="min-h-full flex flex-col">
+        <ThemeApplier />
+        {children}
+      </body>
     </html>
   );
 }
