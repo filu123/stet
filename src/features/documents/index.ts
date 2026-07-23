@@ -16,3 +16,4 @@ export {
   renameDocument,
   updateDocumentContent,
 } from "./lib/document-repository";
+export { getStorageInfo, type StorageInfo } from "./lib/storage-backend";

@@ -164,6 +164,32 @@ The Craft-style floating menu on text selection — no fixed toolbar, ever.
 - [ ] Verify request behavior in the network tab: no request storms, unchanged paragraphs are never re-sent
 - [ ] Toggling proactive off stops all background calls immediately
 
+### Step 11.5 — File-based document storage *(added pre-release: durability)*
+Documents become real files on disk (Obsidian-style), killing the
+browser-storage data-loss risk (incognito, cache clears, Safari eviction).
+
+- Next API routes (`/api/documents`, `/api/storage`) read/write a data folder
+  (`STET_DATA_DIR`, default `~/Stet`): one pretty-printed `.json` per document
+  (lossless canonical) + a readable `.md` sibling named by title slug
+- `features/documents/lib` splits into `browser-repository` (existing Dexie),
+  `file-repository` (fetch), and a `storage-backend` facade with runtime
+  detection: server routes reachable → files; static hosting → browser
+  fallback. Public repository API unchanged — no component churn
+- Dexie `liveQuery` reactivity replaced by a backend-agnostic
+  subscribe/notify: hooks refetch on any mutation
+- One-time migration: existing IndexedDB documents copied into the folder on
+  first files-mode launch
+- Settings dialog shows where documents live
+
+**Done when:**
+- [ ] Creating/editing a doc writes `<id>.json` (+ `.md` sibling) into the data dir; edits update it after autosave
+- [ ] Rename updates the `.md` slug; delete removes both files
+- [ ] Wiping IndexedDB/site data loses NOTHING — reload shows all docs (the whole point)
+- [ ] Pre-existing IndexedDB docs migrate to files on first load, once
+- [ ] With API routes unreachable (static hosting simulation), the app falls back to browser storage and still works fully
+- [ ] Sidebar/breadcrumb stay reactive (create/rename/delete reflect immediately)
+- [ ] Invalid document ids rejected by the API (no path traversal); lint/build/no console errors
+
 ---
 
 ## Phase C — Release (v1.0)

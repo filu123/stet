@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { getStorageInfo, type StorageInfo } from "@/features/documents";
 import { cn } from "@/lib/utils/cn";
 import { THEMES } from "@/lib/themes";
 import { useSettingsStore } from "@/stores/settings-store";
@@ -49,6 +50,7 @@ function SettingsDialogForm({ onClose }: { onClose: () => void }) {
     return savedKey ? maskApiKey(savedKey) : null;
   });
   const [connectionTest, setConnectionTest] = useState<ConnectionTestState>({ status: "idle" });
+  const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -57,6 +59,16 @@ function SettingsDialogForm({ onClose }: { onClose: () => void }) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
+
+  useEffect(() => {
+    let isCancelled = false;
+    void getStorageInfo().then((info) => {
+      if (!isCancelled) setStorageInfo(info);
+    });
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const providerInfo = PROVIDER_CATALOG[provider];
 
@@ -106,10 +118,17 @@ function SettingsDialogForm({ onClose }: { onClose: () => void }) {
       <div className="overlay-fade absolute inset-0 bg-overlay" onClick={onClose} aria-hidden />
 
       <div className="dialog-pop relative w-full max-w-md rounded-card border border-border-subtle bg-surface-card p-6">
-        <h2 className="text-base font-semibold">AI settings</h2>
+        <h2 className="text-base font-semibold">Settings</h2>
         <p className="mt-1 text-sm text-content-tertiary">
           Your key is stored only in this browser and sent only to the provider you choose.
         </p>
+        {storageInfo && (
+          <p className="mt-1 text-xs text-content-tertiary">
+            {storageInfo.mode === "files"
+              ? `Documents are files in ${storageInfo.dataDir}`
+              : "Documents live in this browser's storage (no local server detected)"}
+          </p>
+        )}
 
         <div className="mt-5 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">

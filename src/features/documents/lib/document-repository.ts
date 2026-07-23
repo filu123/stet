@@ -1,61 +1,70 @@
-import { database } from "@/lib/db/database";
 import type { EditorDocument, TipTapJsonContent } from "@/types/document";
 
+import {
+  getStorage,
+  notifyDocumentChanges,
+} from "./storage-backend";
+
 /**
- * The ONLY module allowed to touch the `documents` table.
- * Components and hooks talk to documents exclusively through these functions.
+ * The ONLY module the rest of the app talks to for document persistence.
+ * Delegates to the detected backend (files on disk, or browser storage) and
+ * emits change notifications after every mutation so hooks can refetch.
  */
 
 export async function createDocument(title = "Untitled"): Promise<EditorDocument> {
-  const now = new Date();
-  const document: EditorDocument = {
-    id: crypto.randomUUID(),
-    title,
-    content: null,
-    createdAt: now,
-    updatedAt: now,
-  };
-  await database.documents.add(document);
+  const { backend } = await getStorage();
+  const document = await backend.createDocument(title);
+  notifyDocumentChanges();
   return document;
 }
 
 /**
- * Creates a first document if the database is empty.
- * Runs in a transaction so concurrent calls (e.g. React Strict Mode running an
- * effect twice) can never create duplicates.
+ * Creates a first document if storage is empty. In-flight calls are shared so
+ * React Strict Mode's doubled effects can't create duplicates.
  */
-export async function ensureDocumentExists(): Promise<void> {
-  await database.transaction("rw", database.documents, async () => {
-    const documentCount = await database.documents.count();
-    if (documentCount === 0) {
-      await createDocument();
+let ensureInFlight: Promise<void> | null = null;
+
+export function ensureDocumentExists(): Promise<void> {
+  ensureInFlight ??= (async () => {
+    const { backend } = await getStorage();
+    const documents = await backend.listDocumentsByRecency();
+    if (documents.length === 0) {
+      await backend.createDocument();
+      notifyDocumentChanges();
     }
+  })().finally(() => {
+    ensureInFlight = null;
   });
+  return ensureInFlight;
 }
 
 export async function getDocumentById(id: string): Promise<EditorDocument | undefined> {
-  return database.documents.get(id);
+  const { backend } = await getStorage();
+  return backend.getDocumentById(id);
 }
 
 export async function listDocumentsByRecency(): Promise<EditorDocument[]> {
-  // In-memory sort rather than `orderBy("updatedAt")`: autosave rewrites that
-  // index constantly, and a primary-key scan is immune to index-mutation edge
-  // cases. Document counts are small — sorting in memory is free.
-  const documents = await database.documents.toArray();
-  return documents.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  const { backend } = await getStorage();
+  return backend.listDocumentsByRecency();
 }
 
 export async function updateDocumentContent(
   id: string,
   content: TipTapJsonContent,
 ): Promise<void> {
-  await database.documents.update(id, { content, updatedAt: new Date() });
+  const { backend } = await getStorage();
+  await backend.updateDocumentContent(id, content);
+  notifyDocumentChanges();
 }
 
 export async function renameDocument(id: string, title: string): Promise<void> {
-  await database.documents.update(id, { title, updatedAt: new Date() });
+  const { backend } = await getStorage();
+  await backend.renameDocument(id, title);
+  notifyDocumentChanges();
 }
 
 export async function deleteDocument(id: string): Promise<void> {
-  await database.documents.delete(id);
+  const { backend } = await getStorage();
+  await backend.deleteDocument(id);
+  notifyDocumentChanges();
 }

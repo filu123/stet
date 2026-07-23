@@ -108,6 +108,9 @@ The differentiator. A small floating AI icon in the editor.
 
 ## 7. Decisions made during build
 
+- **Documents are files on disk** (Step 11.5): the local Next server persists each document as JSON (+ readable Markdown sibling) in `~/Stet` (`STET_DATA_DIR`). IndexedDB remains as an automatic fallback for static hosting (the future free playground). Rationale: browser storage dies with cache clears/incognito/Safari eviction; files are user-owned, backupable, and syncable — and they set up both the Tauri desktop app and the future paid cloud sync.
+- **Business direction**: open source (self-host, free) now; hosted cloud (bundled AI, sync, zero setup) later IF the OSS launch shows demand. License decision (MIT vs AGPL) deferred to Step 13 — leaning AGPL to protect a future cloud.
+
 - **The app is named "Stet"** — the proofreader's mark meaning "let it stand", mirroring the accept/dismiss suggestion loop at the heart of the app. The red **squiggle** (editor's wavy underline) is the brand mark/logo. Internal storage keys (IndexedDB name, localStorage keys) keep their old identifiers until a 1.0 migration — renaming them would orphan existing local documents.
 
 - **Document titles** are edited inline in the document header (an input styled as the h1). The first heading in the content is NOT auto-promoted to title — title and content are independent. (Step 4)

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { useLiveQuery } from "dexie-react-hooks";
 import { FileText, MoreHorizontal, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 
@@ -14,13 +13,28 @@ import type { EditorDocument } from "@/types/document";
 import { useActiveDocumentId } from "../hooks/useActiveDocumentId";
 import { useDocumentActions } from "../hooks/useDocumentActions";
 import { listDocumentsByRecency } from "../lib/document-repository";
+import { subscribeToDocumentChanges } from "../lib/storage-backend";
 
 /**
  * Sidebar body: New-document button, search filter (⌘K), and the
  * recency-ordered document list with per-row actions.
  */
 export function SidebarDocumentList() {
-  const documents = useLiveQuery(listDocumentsByRecency, []);
+  const [documents, setDocuments] = useState<EditorDocument[] | undefined>(undefined);
+
+  useEffect(() => {
+    let isCancelled = false;
+    const load = async () => {
+      const loaded = await listDocumentsByRecency();
+      if (!isCancelled) setDocuments(loaded);
+    };
+    void load();
+    const unsubscribe = subscribeToDocumentChanges(() => void load());
+    return () => {
+      isCancelled = true;
+      unsubscribe();
+    };
+  }, []);
   const activeDocumentId = useActiveDocumentId();
   const { createAndOpenDocument, deleteDocumentAndNavigate } = useDocumentActions();
   const [searchQuery, setSearchQuery] = useState("");
