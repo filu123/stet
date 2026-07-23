@@ -11,6 +11,7 @@ import type { EditorDocument } from "@/types/document";
 
 import { DocumentEditor } from "./DocumentEditor";
 import { EditorToolbar } from "./EditorToolbar";
+import { PageResizeHandles } from "./PageResizeHandles";
 import { WordCountPill } from "./WordCountPill";
 import {
   PAGE_GAP_HEIGHT,
@@ -35,7 +36,7 @@ export function EditorScreen({ document }: EditorScreenProps) {
   useAutosaveDocument(editor, document.id);
   useProactiveReview(editor);
   const isSaveToastVisible = useSaveShortcutToast();
-  const { pageWidth, pageLayout, paperSize, fontSize } = useUiPreferencesStore();
+  const { pageWidth, freeWidth, pageLayout, paperSize, fontSize } = useUiPreferencesStore();
 
   // Page view follows the page-setup preferences.
   useEffect(() => {
@@ -56,7 +57,14 @@ export function EditorScreen({ document }: EditorScreenProps) {
         </div>
       )}
 
-      <DocumentCard width={pageWidth} layout={pageLayout} paper={paperSize} fontSize={fontSize}>
+      <DocumentCard
+        width={pageWidth}
+        freeWidth={freeWidth}
+        layout={pageLayout}
+        paper={paperSize}
+        fontSize={fontSize}
+      >
+        {pageWidth === "free" && <PageResizeHandles />}
         <DocumentTitleInput documentId={document.id} initialTitle={document.title} />
         <hr className="mt-6 mb-8 border-border-subtle print-hidden" />
         <div className="editor-body flex-1">

@@ -1,5 +1,5 @@
-/** Document page width preference — shared by the UI store and layout primitives. */
-export type PageWidth = "narrow" | "default" | "wide";
+/** Document page width preference. "free" = user-dragged custom width. */
+export type PageWidth = "default" | "wide" | "free";
 
 /** Color theme. "system" follows the OS light/dark preference. */
 export type ThemeId = "system" | "light" | "dark" | "reading" | "forest" | "midnight";
