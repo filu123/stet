@@ -43,3 +43,7 @@ next-env.d.ts
 # Local-only AI agent instructions (never published)
 AGENTS.md
 CLAUDE.md
+
+# Raw screen recordings (kept local; processed into docs/screenshots)
+*.mov
+*.mp4

@@ -6,7 +6,7 @@
 
 Highlights, circles, wavy underlines, margin notes — suggestions you can see and accept, not a chatbot that rewrites behind your back. Your documents are plain files on your disk. Bring your own API key.
 
-<img src="docs/screenshots/demo.gif" alt="Selecting text in Stet brings up a markup bubble menu; applying a highlight; opening the notes panel with a comment thread" width="820" />
+<img src="docs/screenshots/demo.gif" alt="Stet's AI reviewing a document: grammar suggestions appear as cards you accept or dismiss, alongside highlights, a circled word, and an inline chart" width="820" />
 
 <br />
 
