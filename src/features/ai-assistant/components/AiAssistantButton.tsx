@@ -19,10 +19,12 @@ import { StetMascot } from "./StetMascot";
 
 interface AiAssistantButtonProps {
   editor: Editor;
+  /** Shift left so the button clears the notes panel when it's open. */
+  isNotesPanelOpen?: boolean;
 }
 
 /** The floating AI icon: click to review the document and mark it up. */
-export function AiAssistantButton({ editor }: AiAssistantButtonProps) {
+export function AiAssistantButton({ editor, isNotesPanelOpen = false }: AiAssistantButtonProps) {
   const { phase, errorMessage, suggestions, isProactiveChecking } = useAiReviewStore();
   const clearReview = useAiReviewStore((state) => state.clearReview);
   const [isContinuing, setIsContinuing] = useState(false);
@@ -113,7 +115,12 @@ export function AiAssistantButton({ editor }: AiAssistantButtonProps) {
   };
 
   return (
-    <div className="print-hidden fixed right-6 bottom-6 z-40 flex items-center gap-2">
+    <div
+      className={cn(
+        "print-hidden fixed right-6 bottom-6 z-40 flex items-center gap-2 transition-transform duration-300",
+        isNotesPanelOpen && "md:-translate-x-80",
+      )}
+    >
       {phase === "error" && errorMessage && (
         <button
           type="button"

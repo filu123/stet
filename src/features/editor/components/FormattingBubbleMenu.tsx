@@ -11,6 +11,7 @@ import {
   Highlighter,
   Italic,
   List,
+  MessageSquarePlus,
   Strikethrough,
   TextQuote,
   Underline,
@@ -21,7 +22,9 @@ import { BubbleMenu } from "@tiptap/react/menus";
 import { ToolbarButton } from "@/components/ui/ToolbarButton";
 import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 import { AiBubbleMenuActions } from "@/features/ai-assistant";
+import { beginNoteDraft } from "@/features/notes";
 
+import { LinkControl } from "./LinkControl";
 import { MarkColorSwatches } from "./MarkColorSwatches";
 
 interface FormattingBubbleMenuProps {
@@ -45,6 +48,7 @@ export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
       isUnderline: editorInstance.isActive("underline"),
       isCircle: editorInstance.isActive("circle"),
       isCode: editorInstance.isActive("code"),
+      isLink: editorInstance.isActive("link"),
       isHeading1: editorInstance.isActive("heading", { level: 1 }),
       isHeading2: editorInstance.isActive("heading", { level: 2 }),
       isBulletList: editorInstance.isActive("bulletList"),
@@ -116,6 +120,7 @@ export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
         >
           <Code className="size-3.5" aria-hidden />
         </ToolbarButton>
+        <LinkControl editor={editor} isActive={activeStates.isLink} />
 
         <ToolbarDivider />
 
@@ -171,6 +176,12 @@ export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
             }
           />
         )}
+
+        <ToolbarDivider />
+
+        <ToolbarButton label="Add note" isActive={false} onClick={() => beginNoteDraft(editor)}>
+          <MessageSquarePlus className="size-3.5" aria-hidden />
+        </ToolbarButton>
 
         <AiBubbleMenuActions editor={editor} />
       </div>

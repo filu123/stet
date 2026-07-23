@@ -12,3 +12,6 @@ export type PaperSize = "a4" | "letter";
 
 /** Editor text size. */
 export type EditorFontSize = "small" | "default" | "large";
+
+/** Document typeface. Values map to CSS font-family stacks in globals.css. */
+export type DocumentFont = "sans" | "serif" | "mono" | "rounded";

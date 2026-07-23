@@ -4,6 +4,7 @@ import type { Extensions } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 
 import { AiMarkupExtension } from "@/features/ai-assistant";
+import { NoteMark } from "@/features/notes";
 
 import { CircleMark } from "../extensions/circle-mark";
 import { ColoredUnderline } from "../extensions/colored-underline";
@@ -17,11 +18,21 @@ import { PageViewExtension } from "../extensions/page-view";
  */
 export function buildEditorExtensions(): Extensions {
   return [
-    // ColoredUnderline replaces StarterKit's plain underline
-    StarterKit.configure({ underline: false }),
+    // ColoredUnderline replaces StarterKit's plain underline.
+    // Links come from StarterKit; don't follow them on click while editing.
+    StarterKit.configure({
+      underline: false,
+      link: {
+        openOnClick: false,
+        autolink: true,
+        defaultProtocol: "https",
+        HTMLAttributes: { rel: "noopener noreferrer nofollow", target: "_blank" },
+      },
+    }),
     ColoredUnderline,
     Highlight.configure({ multicolor: true }),
     CircleMark,
+    NoteMark,
     PageBreak,
     PageViewExtension,
     Placeholder.configure({ placeholder: "Start writing…" }),

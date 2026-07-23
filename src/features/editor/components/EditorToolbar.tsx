@@ -27,6 +27,8 @@ import { useEditorState, type Editor } from "@tiptap/react";
 import { ToolbarButton } from "@/components/ui/ToolbarButton";
 import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 
+import { EmojiControl } from "./EmojiControl";
+import { LinkControl } from "./LinkControl";
 import { MarkColorSwatches } from "./MarkColorSwatches";
 import { PageSetupControl } from "./PageSetupControl";
 import { PageWidthControl } from "./PageWidthControl";
@@ -54,6 +56,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       isUnderline: editorInstance.isActive("underline"),
       isCircle: editorInstance.isActive("circle"),
       isHighlighted: editorInstance.isActive("highlight"),
+      isLink: editorInstance.isActive("link"),
       isCode: editorInstance.isActive("code"),
       isHeading1: editorInstance.isActive("heading", { level: 1 }),
       isHeading2: editorInstance.isActive("heading", { level: 2 }),
@@ -149,6 +152,8 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton label="Inline code" isActive={state.isCode} onClick={() => chain().toggleCode().run()}>
         <Code className="size-3.5" aria-hidden />
       </ToolbarButton>
+      <LinkControl editor={editor} isActive={state.isLink} />
+      <EmojiControl editor={editor} />
 
       <ToolbarDivider />
 

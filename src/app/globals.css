@@ -49,6 +49,11 @@
   --mark-green: #1f9e54;
   --mark-purple: #7c4dff;
 
+  /* Note (comment) anchors — amber, Google-Docs-ish */
+  --note-anchor-bg: rgba(234, 179, 8, 0.18);
+  --note-anchor-bg-active: rgba(234, 179, 8, 0.34);
+  --note-anchor-line: rgba(202, 138, 4, 0.9);
+
   /* Document card */
   --card-radius: 12px;
 }
@@ -87,6 +92,10 @@
   --mark-blue: #409cff;
   --mark-green: #34c471;
   --mark-purple: #9e7bff;
+
+  --note-anchor-bg: rgba(234, 179, 8, 0.22);
+  --note-anchor-bg-active: rgba(234, 179, 8, 0.4);
+  --note-anchor-line: rgba(250, 204, 21, 0.85);
 }
 
 :root[data-theme="dark"] {
@@ -175,6 +184,8 @@
   --color-ai-style: var(--ai-style);
   --color-ai-circle: var(--ai-circle);
 
+  --color-note-anchor: var(--note-anchor-line);
+
   --radius-card: var(--card-radius);
 
   /* Widths — `max-w-document` = the floating page surface */
@@ -183,6 +194,8 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-logo: var(--font-instrument-serif);
+  --font-doc-serif: var(--font-lora), Georgia, serif;
+  --font-doc-rounded: var(--font-nunito), sans-serif;
 }
 
 body {
@@ -342,6 +355,21 @@ body {
   -webkit-box-decoration-break: clone;
 }
 
+/* Note (comment) anchors — a soft amber highlight with an underline, clickable. */
+.tiptap-content .note-anchor {
+  background-color: var(--note-anchor-bg);
+  border-bottom: 2px solid var(--note-anchor-line);
+  border-radius: 3px 3px 0 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.tiptap-content .note-anchor:hover {
+  background-color: var(--note-anchor-bg-active);
+}
+
 /* User-applied underline; decoration color comes from the mark's color attr */
 .tiptap-content u {
   text-decoration-thickness: 1.5px;
@@ -452,6 +480,24 @@ body {
 
 .document-card[data-font-size="large"] .tiptap-content {
   font-size: 1.1875rem;
+}
+
+/* Document font setting — one variable drives both the title and the body. */
+.document-card {
+  --doc-font: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.document-card[data-font-family="serif"] {
+  --doc-font: var(--font-lora), Georgia, "Times New Roman", serif;
+}
+.document-card[data-font-family="mono"] {
+  --doc-font: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+}
+.document-card[data-font-family="rounded"] {
+  --doc-font: var(--font-nunito), -apple-system, "Segoe UI", sans-serif;
+}
+.document-card .tiptap-content,
+.document-card input[aria-label="Document title"] {
+  font-family: var(--doc-font);
 }
 
 /* ---------------------------------------------------------------------------

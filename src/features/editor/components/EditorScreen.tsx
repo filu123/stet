@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type MouseEvent } from "react";
 
 import { DocumentCard } from "@/components/ui/DocumentCard";
 import { Toast } from "@/components/ui/Toast";
 import { AiAssistantButton, SuggestionPopover, useProactiveReview } from "@/features/ai-assistant";
 import { DocumentTitleInput } from "@/features/documents";
+import { NotesPanel, NotesToggleButton, useDocumentNotes } from "@/features/notes";
+import { useNotesUiStore } from "@/stores/notes-ui-store";
 import { useUiPreferencesStore } from "@/stores/ui-preferences-store";
 import type { EditorDocument } from "@/types/document";
 
@@ -36,7 +38,11 @@ export function EditorScreen({ document }: EditorScreenProps) {
   useAutosaveDocument(editor, document.id);
   useProactiveReview(editor);
   const isSaveToastVisible = useSaveShortcutToast();
-  const { pageWidth, freeWidth, pageLayout, paperSize, fontSize } = useUiPreferencesStore();
+  const { pageWidth, freeWidth, pageLayout, paperSize, fontSize, fontFamily } =
+    useUiPreferencesStore();
+
+  const notes = useDocumentNotes(editor);
+  const { isPanelOpen, togglePanel, openPanel, focusNote, resetForDocument } = useNotesUiStore();
 
   // Page view follows the page-setup preferences.
   useEffect(() => {
@@ -49,11 +55,28 @@ export function EditorScreen({ document }: EditorScreenProps) {
     );
   }, [editor, pageLayout, paperSize]);
 
+  // A new document starts with no draft/focused note (panel preference persists).
+  useEffect(() => {
+    resetForDocument();
+  }, [document.id, resetForDocument]);
+
+  // Clicking a note's highlighted text opens the panel on that note.
+  const handleEditorClick = (event: MouseEvent<HTMLDivElement>) => {
+    const anchor = (event.target as HTMLElement).closest("[data-note-id]");
+    const noteId = anchor?.getAttribute("data-note-id");
+    if (!noteId) return;
+    openPanel();
+    focusNote(noteId);
+  };
+
   return (
     <>
       {editor && (
-        <div className="editor-toolbar-card sticky top-0 z-10 mb-5 rounded-xl border border-border-subtle bg-surface-card px-2 py-1.5">
-          <EditorToolbar editor={editor} />
+        <div className="editor-toolbar-card sticky top-0 z-10 mb-5 flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-card px-2 py-1.5">
+          <div className="min-w-0 flex-1">
+            <EditorToolbar editor={editor} />
+          </div>
+          <NotesToggleButton count={notes.length} isOpen={isPanelOpen} onClick={togglePanel} />
         </div>
       )}
 
@@ -63,11 +86,12 @@ export function EditorScreen({ document }: EditorScreenProps) {
         layout={pageLayout}
         paper={paperSize}
         fontSize={fontSize}
+        fontFamily={fontFamily}
       >
         {pageWidth === "free" && <PageResizeHandles />}
         <DocumentTitleInput documentId={document.id} initialTitle={document.title} />
         <hr className="mt-6 mb-8 border-border-subtle print-hidden" />
-        <div className="editor-body flex-1">
+        <div className="editor-body flex-1" onClick={handleEditorClick}>
           <DocumentEditor editor={editor} />
         </div>
         {editor && <WordCountPill editor={editor} />}
@@ -75,7 +99,8 @@ export function EditorScreen({ document }: EditorScreenProps) {
 
       {editor && (
         <>
-          <AiAssistantButton editor={editor} />
+          <NotesPanel editor={editor} notes={notes} />
+          <AiAssistantButton editor={editor} isNotesPanelOpen={isPanelOpen} />
           <SuggestionPopover editor={editor} />
         </>
       )}

@@ -6,14 +6,30 @@ import { FileCog, Printer } from "lucide-react";
 
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { ToolbarButton } from "@/components/ui/ToolbarButton";
+import { cn } from "@/lib/utils/cn";
 import { useUiPreferencesStore } from "@/stores/ui-preferences-store";
-import type { EditorFontSize, PageLayout, PaperSize } from "@/types/ui";
+import type { DocumentFont, EditorFontSize, PageLayout, PaperSize } from "@/types/ui";
 
-/** Toolbar popover: page layout, paper size, text size, print. */
+const FONT_OPTIONS: { value: DocumentFont; label: string; className: string }[] = [
+  { value: "sans", label: "Sans", className: "font-sans" },
+  { value: "serif", label: "Serif", className: "font-doc-serif" },
+  { value: "rounded", label: "Rounded", className: "font-doc-rounded" },
+  { value: "mono", label: "Mono", className: "font-mono" },
+];
+
+/** Toolbar popover: page layout, paper size, text size, font, print. */
 export function PageSetupControl() {
   const [isOpen, setIsOpen] = useState(false);
-  const { pageLayout, paperSize, fontSize, setPageLayout, setPaperSize, setFontSize } =
-    useUiPreferencesStore();
+  const {
+    pageLayout,
+    paperSize,
+    fontSize,
+    fontFamily,
+    setPageLayout,
+    setPaperSize,
+    setFontSize,
+    setFontFamily,
+  } = useUiPreferencesStore();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -77,6 +93,28 @@ export function PageSetupControl() {
                 onChange={setFontSize}
               />
             </label>
+
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-medium text-content-secondary">Font</span>
+              <div className="grid grid-cols-2 gap-1">
+                {FONT_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setFontFamily(option.value)}
+                    className={cn(
+                      "rounded-lg border px-2.5 py-1.5 text-sm transition-colors",
+                      option.className,
+                      fontFamily === option.value
+                        ? "border-accent bg-accent-soft text-content-primary"
+                        : "border-border-subtle text-content-secondary hover:bg-surface-hover hover:text-content-primary",
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <button
               type="button"
