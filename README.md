@@ -10,7 +10,7 @@ Highlights, circles, wavy underlines, margin notes — suggestions you can see a
 
 <br />
 
-**[▶ Try the live demo](https://stet.vercel.app)** &nbsp;·&nbsp; runs entirely in your browser, no install, no account
+**[▶ Try the live demo](https://stetai.vercel.app)** &nbsp;·&nbsp; runs entirely in your browser, no install, no account
 
 </div>
 
