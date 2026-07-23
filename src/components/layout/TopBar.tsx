@@ -2,21 +2,18 @@
 
 import { useRef, useState, type ChangeEvent } from "react";
 
-import { ChevronRight, Download, House, PanelLeft, Settings, Upload } from "lucide-react";
+import { ChevronRight, House, PanelLeft, Settings, Upload } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { ExportMenu } from "@/components/layout/ExportMenu";
 import { IconButton } from "@/components/ui/IconButton";
 import {
   SaveStatusIndicator,
   useActiveDocumentId,
   useDocument,
 } from "@/features/documents";
-import {
-  exportDocumentAsMarkdown,
-  IMPORTABLE_EXTENSIONS,
-  importFileAsNewDocument,
-} from "@/features/editor";
+import { IMPORTABLE_EXTENSIONS, importFileAsNewDocument } from "@/features/editor";
 import { SettingsDialog } from "@/features/settings";
 
 interface TopBarProps {
@@ -79,16 +76,7 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
       <div className="flex shrink-0 items-center gap-2">
         <SaveStatusIndicator />
 
-        {document && (
-          <button
-            type="button"
-            onClick={() => exportDocumentAsMarkdown(document)}
-            className="flex h-9 items-center gap-1.5 rounded-lg border border-border-subtle bg-surface-card px-3 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-hover hover:text-content-primary"
-          >
-            <Download className="size-3.5" aria-hidden />
-            Export
-          </button>
-        )}
+        {document && <ExportMenu document={document} />}
         <IconButton
           aria-label="Import file"
           title="Import file (Markdown, text, HTML, Word)"

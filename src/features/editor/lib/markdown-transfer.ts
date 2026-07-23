@@ -1,24 +1,7 @@
 import { createDocument, updateDocumentContent } from "@/features/documents";
-import type { EditorDocument, TipTapJsonContent } from "@/types/document";
+import type { TipTapJsonContent } from "@/types/document";
 
-import {
-  documentContentToMarkdown,
-  htmlToDocumentContent,
-  markdownToDocumentContent,
-} from "./markdown-serializer";
-
-/** Downloads the document as a `.md` file named after its title. */
-export function exportDocumentAsMarkdown(editorDocument: EditorDocument): void {
-  const markdown = documentContentToMarkdown(editorDocument.content);
-  const blob = new Blob([markdown], { type: "text/markdown" });
-  const url = URL.createObjectURL(blob);
-
-  const anchor = window.document.createElement("a");
-  anchor.href = url;
-  anchor.download = `${editorDocument.title}.md`;
-  anchor.click();
-  URL.revokeObjectURL(url);
-}
+import { htmlToDocumentContent, markdownToDocumentContent } from "./markdown-serializer";
 
 /** File extensions the import button accepts (also used by the file input). */
 export const IMPORTABLE_EXTENSIONS = ".md,.markdown,.txt,.html,.htm,.docx";

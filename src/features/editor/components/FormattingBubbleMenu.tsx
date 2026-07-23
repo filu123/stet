@@ -8,12 +8,12 @@ import {
   Code,
   Heading1,
   Heading2,
+  Highlighter,
   Italic,
   List,
   Strikethrough,
   TextQuote,
   Underline,
-  X,
 } from "lucide-react";
 import { useEditorState, type Editor } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
@@ -22,7 +22,6 @@ import { ToolbarButton } from "@/components/ui/ToolbarButton";
 import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 import { AiBubbleMenuActions } from "@/features/ai-assistant";
 
-import { HIGHLIGHT_COLORS } from "../lib/highlight-colors";
 import { MarkColorSwatches } from "./MarkColorSwatches";
 
 interface FormattingBubbleMenuProps {
@@ -34,7 +33,9 @@ interface FormattingBubbleMenuProps {
  * Flat surface, hairline border, no shadow (AGENTS.md).
  */
 export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
-  const [openColorPicker, setOpenColorPicker] = useState<"underline" | "circle" | null>(null);
+  const [openColorPicker, setOpenColorPicker] = useState<
+    "underline" | "circle" | "highlight" | null
+  >(null);
   const activeStates = useEditorState({
     editor,
     selector: ({ editor: editorInstance }) => ({
@@ -149,30 +150,26 @@ export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
 
         <ToolbarDivider />
 
-        {HIGHLIGHT_COLORS.map((color) => (
-          <ToolbarButton
-            key={color.name}
-            label={`Highlight ${color.name}`}
-            isActive={editor.isActive("highlight", { color: color.cssValue })}
-            onClick={() =>
-              editor.chain().focus().toggleHighlight({ color: color.cssValue }).run()
+        <ToolbarButton
+          label="Highlight"
+          isActive={activeStates.isHighlighted || openColorPicker === "highlight"}
+          onClick={() =>
+            setOpenColorPicker((current) => (current === "highlight" ? null : "highlight"))
+          }
+        >
+          <Highlighter className="size-3.5" aria-hidden />
+        </ToolbarButton>
+        {openColorPicker === "highlight" && (
+          <MarkColorSwatches
+            variant="highlight"
+            isColorActive={(color) => editor.isActive("highlight", { color })}
+            onPick={(color) => editor.chain().focus().toggleHighlight({ color }).run()}
+            onRemove={
+              activeStates.isHighlighted
+                ? () => editor.chain().focus().unsetHighlight().run()
+                : undefined
             }
-          >
-            <span
-              className="size-3.5 rounded-full border border-border-subtle"
-              style={{ backgroundColor: color.cssValue }}
-              aria-hidden
-            />
-          </ToolbarButton>
-        ))}
-        {activeStates.isHighlighted && (
-          <ToolbarButton
-            label="Remove highlight"
-            isActive={false}
-            onClick={() => editor.chain().focus().unsetHighlight().run()}
-          >
-            <X className="size-3.5" aria-hidden />
-          </ToolbarButton>
+          />
         )}
 
         <AiBubbleMenuActions editor={editor} />

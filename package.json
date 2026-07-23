@@ -17,6 +17,7 @@
     "clsx": "^2.1.1",
     "dexie": "^4.4.4",
     "dexie-react-hooks": "^4.4.0",
+    "docx": "^9.7.1",
     "lucide-react": "^1.25.0",
     "mammoth": "^1.12.0",
     "marked": "^18.0.7",

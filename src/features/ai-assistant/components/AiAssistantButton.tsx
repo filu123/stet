@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { Loader2, PenLine, Sparkles, X } from "lucide-react";
+import { Loader2, PenLine, X } from "lucide-react";
 import type { Editor } from "@tiptap/react";
 
 import { useAiReviewStore } from "@/stores/ai-review-store";
@@ -15,6 +15,7 @@ import { buildDocumentTextIndex, resolveQuoteRange } from "../lib/position-mappe
 import { requestDocumentReview } from "../lib/review-service";
 import { requestContinuation } from "../lib/rewrite-service";
 import { AiActionMenu } from "./AiActionMenu";
+import { StetMascot } from "./StetMascot";
 
 interface AiAssistantButtonProps {
   editor: Editor;
@@ -182,7 +183,7 @@ export function AiAssistantButton({ editor }: AiAssistantButtonProps) {
           {phase === "reviewing" ? (
             <Loader2 className="size-5 animate-spin" aria-hidden />
           ) : (
-            <Sparkles className="size-5" aria-hidden />
+            <StetMascot className="size-7" />
           )}
         </button>
 

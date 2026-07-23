@@ -69,3 +69,18 @@ export function markdownToDocumentContent(markdown: string): TipTapJsonContent {
 export function htmlToDocumentContent(html: string): TipTapJsonContent {
   return generateJSON(html, buildEditorExtensions());
 }
+
+/** Blocks joined by blank lines — for .txt export. */
+export function documentContentToPlainText(content: TipTapJsonContent | null): string {
+  if (!content) return "";
+  const documentNode = ProseMirrorNode.fromJSON(schema, content);
+  const blocks: string[] = [];
+  documentNode.descendants((node) => {
+    if (node.isTextblock) {
+      blocks.push(node.textContent);
+      return false;
+    }
+    return true;
+  });
+  return blocks.filter((block) => block.trim().length > 0).join("\n\n");
+}

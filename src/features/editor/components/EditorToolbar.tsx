@@ -9,6 +9,7 @@ import {
   Heading1,
   Heading2,
   Heading3,
+  Highlighter,
   Italic,
   List,
   ListOrdered,
@@ -26,7 +27,6 @@ import { useEditorState, type Editor } from "@tiptap/react";
 import { ToolbarButton } from "@/components/ui/ToolbarButton";
 import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 
-import { HIGHLIGHT_COLORS } from "../lib/highlight-colors";
 import { MarkColorSwatches } from "./MarkColorSwatches";
 import { PageSetupControl } from "./PageSetupControl";
 import { PageWidthControl } from "./PageWidthControl";
@@ -40,7 +40,9 @@ interface EditorToolbarProps {
  * Flat surface, hairline border, no shadow (AGENTS.md).
  */
 export function EditorToolbar({ editor }: EditorToolbarProps) {
-  const [openColorPicker, setOpenColorPicker] = useState<"underline" | "circle" | null>(null);
+  const [openColorPicker, setOpenColorPicker] = useState<
+    "underline" | "circle" | "highlight" | null
+  >(null);
   const state = useEditorState({
     editor,
     selector: ({ editor: editorInstance }) => ({
@@ -51,6 +53,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       isStrike: editorInstance.isActive("strike"),
       isUnderline: editorInstance.isActive("underline"),
       isCircle: editorInstance.isActive("circle"),
+      isHighlighted: editorInstance.isActive("highlight"),
       isCode: editorInstance.isActive("code"),
       isHeading1: editorInstance.isActive("heading", { level: 1 }),
       isHeading2: editorInstance.isActive("heading", { level: 2 }),
@@ -128,6 +131,21 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
           onPick={(color) => chain().toggleCircle({ color }).run()}
         />
       )}
+      <ToolbarButton
+        label="Highlight"
+        isActive={state.isHighlighted || openColorPicker === "highlight"}
+        onClick={() => setOpenColorPicker((current) => (current === "highlight" ? null : "highlight"))}
+      >
+        <Highlighter className="size-3.5" aria-hidden />
+      </ToolbarButton>
+      {openColorPicker === "highlight" && (
+        <MarkColorSwatches
+          variant="highlight"
+          isColorActive={(color) => editor.isActive("highlight", { color })}
+          onPick={(color) => chain().toggleHighlight({ color }).run()}
+          onRemove={state.isHighlighted ? () => chain().unsetHighlight().run() : undefined}
+        />
+      )}
       <ToolbarButton label="Inline code" isActive={state.isCode} onClick={() => chain().toggleCode().run()}>
         <Code className="size-3.5" aria-hidden />
       </ToolbarButton>
@@ -152,23 +170,6 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       <ToolbarButton label="Insert page break (⌘↵)" onClick={() => chain().setPageBreak().run()}>
         <SeparatorHorizontal className="size-3.5" aria-hidden />
       </ToolbarButton>
-
-      <ToolbarDivider />
-
-      {HIGHLIGHT_COLORS.map((color) => (
-        <ToolbarButton
-          key={color.name}
-          label={`Highlight ${color.name}`}
-          isActive={editor.isActive("highlight", { color: color.cssValue })}
-          onClick={() => chain().toggleHighlight({ color: color.cssValue }).run()}
-        >
-          <span
-            className="size-3.5 rounded-full border border-border-subtle"
-            style={{ backgroundColor: color.cssValue }}
-            aria-hidden
-          />
-        </ToolbarButton>
-      ))}
 
       <div className="ml-auto flex items-center gap-0.5 pl-2">
         <ToolbarDivider />
