@@ -2,6 +2,13 @@
   "name": "stet",
   "version": "0.1.0",
   "private": true,
+  "description": "An open source, local-first document editor with an AI that marks up your writing like a human editor.",
+  "license": "AGPL-3.0-or-later",
+  "homepage": "https://github.com/filu123/stet",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/filu123/stet.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

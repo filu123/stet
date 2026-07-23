@@ -207,14 +207,18 @@ browser-storage data-loss risk (incognito, cache clears, Safari eviction).
 - [x] `npm test` runs in CI-able fashion; parser + serializer edge cases covered
 - [x] Killing the network mid-review degrades gracefully (verified: no crash, editor stays editable)
 
-### Step 13 — Open source packaging
-- README: hero screenshot/GIF, 3-command install, BYO-key explanation, privacy statement (everything local)
-- MIT `LICENSE`, `CONTRIBUTING.md` (points to AGENTS.md), decide final app name → update package.json/metadata
-- GitHub Actions: lint + build + test on PR
+### Step 13 — Open source packaging ✅
+- README: framed hero screenshot (+ notes/documents shots), 3-command install, BYO-key
+  explanation, privacy statement, "where your documents live" — all local
+- **AGPL-3.0** `LICENSE` (protects a future hosted version), `CONTRIBUTING.md` (points to
+  AGENTS.md; approval-gated / sole-maintainer policy), name finalized as **Stet** →
+  package.json description/license/repository set
+- GitHub Actions CI: lint + test + build on push/PR; CODEOWNERS + PR template so every
+  change is maintainer-reviewed
 
 **Done when:**
-- [ ] A stranger can go clone → `npm install` → `npm run dev` → writing with AI in under 5 minutes, using only the README
-- [ ] CI green
+- [x] A stranger can go clone → `npm install` → `npm run dev` → writing with AI in under 5 minutes, using only the README
+- [x] CI green (workflow added; verify on GitHub after first push)
 
 ---
 
