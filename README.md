@@ -6,7 +6,11 @@
 
 Highlights, circles, wavy underlines, margin notes — suggestions you can see and accept, not a chatbot that rewrites behind your back. Your documents are plain files on your disk. Bring your own API key.
 
-<img src="docs/screenshots/hero.png" alt="Stet — the Cartographer's Daughter demo document, with AI markup, an inline chart, and margin notes" width="900" />
+<img src="docs/screenshots/demo.gif" alt="Selecting text in Stet brings up a markup bubble menu; applying a highlight; opening the notes panel with a comment thread" width="820" />
+
+<br />
+
+**[▶ Try the live demo](https://stet.vercel.app)** &nbsp;·&nbsp; runs entirely in your browser, no install, no account
 
 </div>
 
@@ -64,7 +68,15 @@ STET_DATA_DIR=~/Documents/Stet npm run dev
 
 Each document is a pretty-printed `<id>.json` (the canonical source) plus a `<slug>.<id>.md` sibling you can read or grep. Folders are real subdirectories; images live in `<STET_DATA_DIR>/images`. Back it up like any other folder.
 
-> **No server for your data.** The Next.js app *is* the local server that reads and writes that folder. If you deploy Stet as a static site instead, it transparently falls back to in-browser storage (IndexedDB).
+> **No server for your data.** The Next.js app *is* the local server that reads and writes that folder. If you deploy Stet to an ephemeral host instead, it transparently falls back to in-browser storage (IndexedDB).
+
+### Deploy a hosted instance
+
+For a shareable, no-install instance (like the live demo), deploy to Vercel and set **`STET_STORAGE_MODE=browser`** so documents persist in each visitor's own browser instead of a disappearing serverless disk:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ffilu123%2Fstet&env=STET_STORAGE_MODE&envDescription=Set%20to%20%22browser%22%20for%20a%20hosted%20demo)
+
+Everything stays client-side and BYO-key — a hosted Stet never sees your documents or your API key.
 
 ## Privacy
 
