@@ -68,3 +68,32 @@ export async function deleteDocument(id: string): Promise<void> {
   await backend.deleteDocument(id);
   notifyDocumentChanges();
 }
+
+/* --- Folders ---------------------------------------------------------------- */
+
+export async function listFolders() {
+  const { backend } = await getStorage();
+  return backend.listFolders();
+}
+
+export async function createFolder(name: string): Promise<void> {
+  const { backend } = await getStorage();
+  await backend.createFolder(name);
+  notifyDocumentChanges();
+}
+
+/** Deleting a folder moves its documents back to unfiled — never deletes them. */
+export async function deleteFolder(name: string): Promise<void> {
+  const { backend } = await getStorage();
+  await backend.deleteFolder(name);
+  notifyDocumentChanges();
+}
+
+export async function moveDocumentToFolder(
+  id: string,
+  folderName: string | null,
+): Promise<void> {
+  const { backend } = await getStorage();
+  await backend.moveDocumentToFolder(id, folderName);
+  notifyDocumentChanges();
+}

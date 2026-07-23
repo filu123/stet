@@ -1,14 +1,16 @@
-import type { EditorDocument, TipTapJsonContent } from "@/types/document";
+import type { EditorDocument, FolderSummary, TipTapJsonContent } from "@/types/document";
 
 /**
- * File storage backend — talks to the local server's /api/documents routes,
- * which persist each document as a JSON file (+ Markdown sibling) on disk.
+ * File storage backend — talks to the local server's /api routes, which
+ * persist each document as a JSON file (+ Markdown sibling) on disk; folders
+ * are real subdirectories of the data dir.
  */
 
 interface SerializedDocument {
   id: string;
   title: string;
   content: TipTapJsonContent | null;
+  folderName?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -16,6 +18,7 @@ interface SerializedDocument {
 function reviveDocument(serialized: SerializedDocument): EditorDocument {
   return {
     ...serialized,
+    folderName: serialized.folderName ?? null,
     createdAt: new Date(serialized.createdAt),
     updatedAt: new Date(serialized.updatedAt),
   };
@@ -80,7 +83,39 @@ export async function putFullDocument(document: EditorDocument): Promise<void> {
   await putDocumentPatch(document.id, {
     title: document.title,
     content: document.content,
+    folderName: document.folderName,
     createdAt: document.createdAt.toISOString(),
     updatedAt: document.updatedAt.toISOString(),
   });
+}
+
+/* --- Folders ---------------------------------------------------------------- */
+
+export async function listFolders(): Promise<FolderSummary[]> {
+  const response = await fetch("/api/folders", { cache: "no-store" });
+  if (!response.ok) throw new Error(`Loading folders failed (HTTP ${response.status}).`);
+  return (await response.json()) as FolderSummary[];
+}
+
+export async function createFolder(name: string): Promise<void> {
+  const response = await fetch("/api/folders", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+  if (!response.ok) throw new Error(`Creating the folder failed (HTTP ${response.status}).`);
+}
+
+export async function deleteFolder(name: string): Promise<void> {
+  const response = await fetch(`/api/folders/${encodeURIComponent(name)}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) throw new Error(`Deleting the folder failed (HTTP ${response.status}).`);
+}
+
+export async function moveDocumentToFolder(
+  id: string,
+  folderName: string | null,
+): Promise<void> {
+  await putDocumentPatch(id, { folderName });
 }

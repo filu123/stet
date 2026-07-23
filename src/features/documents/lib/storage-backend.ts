@@ -19,6 +19,10 @@ export interface DocumentBackend {
   updateDocumentContent(id: string, content: TipTapJsonContent): Promise<void>;
   renameDocument(id: string, title: string): Promise<void>;
   deleteDocument(id: string): Promise<void>;
+  listFolders(): Promise<import("@/types/document").FolderSummary[]>;
+  createFolder(name: string): Promise<void>;
+  deleteFolder(name: string): Promise<void>;
+  moveDocumentToFolder(id: string, folderName: string | null): Promise<void>;
 }
 
 export interface StorageInfo {

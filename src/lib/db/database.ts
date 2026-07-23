@@ -15,9 +15,17 @@ import type { EditorDocument } from "@/types/document";
  */
 export const database = new Dexie("opensource-editor-ai") as Dexie & {
   documents: EntityTable<EditorDocument, "id">;
+  folders: EntityTable<{ name: string }, "name">;
 };
 
 database.version(1).stores({
   // Indexed fields only — non-indexed fields (content, createdAt) are still stored.
   documents: "id, title, updatedAt",
+});
+
+// v2: folders + document folder membership (older records lack folderName —
+// readers normalize `undefined` to null).
+database.version(2).stores({
+  documents: "id, title, updatedAt, folderName",
+  folders: "name",
 });

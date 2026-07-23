@@ -15,8 +15,19 @@ export interface EditorDocument {
    * `null` for a freshly created, never-edited document.
    */
   content: TipTapJsonContent | null;
+  /**
+   * Folder the document lives in (folders are identified by name; in file
+   * storage they are real subdirectories of the data dir). `null` = unfiled.
+   */
+  folderName: string | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+/** A folder as shown in the sidebar. */
+export interface FolderSummary {
+  name: string;
+  documentCount: number;
 }
 
 /**
