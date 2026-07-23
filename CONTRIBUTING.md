@@ -16,7 +16,7 @@ If you want Stet to do something it doesn’t, the fastest path is usually to **
 
 ## Ground rules for any change
 
-All code must follow the constitution in **[AGENTS.md](AGENTS.md)** — architecture, naming, component limits, the no-shadows design rule, and the TypeScript bar. A change that violates a rule there won’t be merged; restructure the change instead of bending the rule.
+Match the project’s existing architecture and style: feature-first structure (`src/features/*`), small single-purpose components, no business logic in components, strict TypeScript (no `any`), design-token-driven Tailwind, and **no shadows** anywhere in the UI (depth comes from surface contrast and hairline borders). A change that fights these conventions will be asked to restructure rather than bend them.
 
 Before you push, every one of these must pass with **zero new warnings**:
 

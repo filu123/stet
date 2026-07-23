@@ -85,7 +85,7 @@ npm test        # Vitest unit tests
 
 ## Contributing
 
-Stet is developed by a single maintainer with a specific vision, and **every change is reviewed and merged by the maintainer**. Pull requests are welcome but not guaranteed to be merged — please **open an issue to discuss first** so we don’t both waste effort. See [CONTRIBUTING.md](CONTRIBUTING.md), and the code constitution in [AGENTS.md](AGENTS.md) that all changes must follow.
+Stet is developed by a single maintainer with a specific vision, and **every change is reviewed and merged by the maintainer**. Pull requests are welcome but not guaranteed to be merged — please **open an issue to discuss first** so we don’t both waste effort. See [CONTRIBUTING.md](CONTRIBUTING.md) before opening one.
 
 ## License
 

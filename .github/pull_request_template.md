@@ -12,7 +12,7 @@ Closes #
 ## Checklist
 
 - [ ] I opened/linked an issue and it was acknowledged
-- [ ] Follows the rules in [AGENTS.md](../AGENTS.md)
+- [ ] Matches the project’s existing architecture and style
 - [ ] `npm run lint` passes with no new warnings
 - [ ] `npm test` passes
 - [ ] `npm run build` succeeds
