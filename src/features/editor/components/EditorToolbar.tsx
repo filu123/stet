@@ -28,6 +28,8 @@ import { ToolbarButton } from "@/components/ui/ToolbarButton";
 import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 
 import { EmojiControl } from "./EmojiControl";
+import { FontControl } from "./FontControl";
+import { ImageControl } from "./ImageControl";
 import { LinkControl } from "./LinkControl";
 import { MarkColorSwatches } from "./MarkColorSwatches";
 import { PageSetupControl } from "./PageSetupControl";
@@ -153,6 +155,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Code className="size-3.5" aria-hidden />
       </ToolbarButton>
       <LinkControl editor={editor} isActive={state.isLink} />
+      <ImageControl editor={editor} />
       <EmojiControl editor={editor} />
 
       <ToolbarDivider />
@@ -178,6 +181,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       <div className="ml-auto flex items-center gap-0.5 pl-2">
         <ToolbarDivider />
+        <FontControl />
         <PageWidthControl />
         <PageSetupControl />
       </div>

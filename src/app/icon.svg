@@ -1,0 +1,19 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="7" fill="#4f46e5"/>
+  <g transform="translate(4 4)">
+    <!-- Folded paper flap + head (one white silhouette) -->
+    <path d="M4.8 9 V4.8 L6.9 2.7 H11.6 V9 Z" fill="#ffffff"/>
+    <circle cx="12" cy="13.6" r="7.3" fill="#ffffff"/>
+    <!-- Dog-ear fold -->
+    <path d="M4.8 4.8 H6.9 V2.7" fill="none" stroke="#4f46e5" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round" opacity="0.5"/>
+    <!-- Sunglasses -->
+    <g fill="#4f46e5">
+      <rect x="7.1" y="11.2" width="4" height="3.4" rx="1.7"/>
+      <rect x="12.9" y="11.2" width="4" height="3.4" rx="1.7"/>
+      <rect x="10.9" y="11.9" width="2.2" height="0.8" rx="0.4"/>
+    </g>
+    <path d="M7.1 12 L5.6 11.5 M16.9 12 L18.4 11.5" stroke="#4f46e5" stroke-width="0.9" stroke-linecap="round"/>
+    <!-- Smile -->
+    <path d="M9.5 17 Q 12 19, 14.5 17" fill="none" stroke="#4f46e5" stroke-width="1.3" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -28,13 +28,20 @@ export interface SerializedDocument {
 const DOCUMENT_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** No path separators, no leading dot, sane length. */
 const FOLDER_NAME_PATTERN = /^(?!\.)[^/\\]{1,60}$/;
+/** Directories the app owns — never shown or usable as document folders. */
+const RESERVED_DIRECTORY_NAMES = new Set(["images"]);
 
 export function isValidDocumentId(id: string): boolean {
   return DOCUMENT_ID_PATTERN.test(id);
 }
 
 export function isValidFolderName(name: string): boolean {
-  return FOLDER_NAME_PATTERN.test(name) && name.trim() === name && name !== "";
+  return (
+    FOLDER_NAME_PATTERN.test(name) &&
+    name.trim() === name &&
+    name !== "" &&
+    !RESERVED_DIRECTORY_NAMES.has(name.toLowerCase())
+  );
 }
 
 export function getDataDirectory(): string {

@@ -193,7 +193,6 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-logo: var(--font-instrument-serif);
   --font-doc-serif: var(--font-lora), Georgia, serif;
   --font-doc-rounded: var(--font-nunito), sans-serif;
 }
@@ -332,6 +331,20 @@ body {
 
 .tiptap-content strong {
   font-weight: 600;
+}
+
+/* Embedded images — responsive, gently rounded, centered as a block. */
+.tiptap-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.25rem auto;
+  border-radius: 10px;
+}
+
+.tiptap-content img.ProseMirror-selectednode {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Highlights render as Craft-style pills; background color comes from the

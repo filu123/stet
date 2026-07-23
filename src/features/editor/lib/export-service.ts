@@ -76,7 +76,11 @@ function buildStandaloneHtml(
   options: { forPrint?: boolean } = {},
 ): string {
   const bodyHtml = editorDocument.content
-    ? replaceTokenColors(generateHTML(editorDocument.content, buildEditorExtensions()))
+    ? // Absolutize on-disk image srcs so they still resolve in a standalone file.
+      replaceTokenColors(generateHTML(editorDocument.content, buildEditorExtensions())).replaceAll(
+        'src="/api/',
+        `src="${window.location.origin}/api/`,
+      )
     : "";
   const printScript = options.forPrint
     ? `<script>window.onload = () => { window.focus(); window.print(); };</scr` + `ipt>`

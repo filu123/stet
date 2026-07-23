@@ -22,6 +22,7 @@ import {
 } from "../extensions/page-view";
 import { useAutosaveDocument } from "../hooks/useAutosaveDocument";
 import { useDocumentEditor } from "../hooks/useDocumentEditor";
+import { useImageDropPaste } from "../hooks/useImageDropPaste";
 import { useSaveShortcutToast } from "../hooks/useSaveShortcutToast";
 
 interface EditorScreenProps {
@@ -36,6 +37,7 @@ interface EditorScreenProps {
 export function EditorScreen({ document }: EditorScreenProps) {
   const editor = useDocumentEditor(document.content);
   useAutosaveDocument(editor, document.id);
+  useImageDropPaste(editor);
   useProactiveReview(editor);
   const isSaveToastVisible = useSaveShortcutToast();
   const { pageWidth, freeWidth, pageLayout, paperSize, fontSize, fontFamily } =

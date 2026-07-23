@@ -40,8 +40,8 @@ export function NoteThread({ editor, note, isFocused }: NoteThreadProps) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-2.5 rounded-xl border p-3 transition-colors",
-        isFocused ? "border-accent bg-accent-soft" : "border-border-subtle bg-surface-card",
+        "flex flex-col gap-2.5 rounded-xl border bg-surface-card p-3 transition-colors",
+        isFocused ? "border-accent" : "border-border-subtle",
       )}
     >
       <button

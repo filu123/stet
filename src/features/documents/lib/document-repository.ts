@@ -18,26 +18,6 @@ export async function createDocument(title = "Untitled"): Promise<EditorDocument
   return document;
 }
 
-/**
- * Creates a first document if storage is empty. In-flight calls are shared so
- * React Strict Mode's doubled effects can't create duplicates.
- */
-let ensureInFlight: Promise<void> | null = null;
-
-export function ensureDocumentExists(): Promise<void> {
-  ensureInFlight ??= (async () => {
-    const { backend } = await getStorage();
-    const documents = await backend.listDocumentsByRecency();
-    if (documents.length === 0) {
-      await backend.createDocument();
-      notifyDocumentChanges();
-    }
-  })().finally(() => {
-    ensureInFlight = null;
-  });
-  return ensureInFlight;
-}
-
 export async function getDocumentById(id: string): Promise<EditorDocument | undefined> {
   const { backend } = await getStorage();
   return backend.getDocumentById(id);

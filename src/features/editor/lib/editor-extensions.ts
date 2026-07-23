@@ -1,4 +1,5 @@
 import { Highlight } from "@tiptap/extension-highlight";
+import { Image } from "@tiptap/extension-image";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import type { Extensions } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
@@ -31,6 +32,8 @@ export function buildEditorExtensions(): Extensions {
     }),
     ColoredUnderline,
     Highlight.configure({ multicolor: true }),
+    // allowBase64 so browser-storage mode can embed images as data URLs.
+    Image.configure({ allowBase64: true, HTMLAttributes: { class: "doc-image" } }),
     CircleMark,
     NoteMark,
     PageBreak,

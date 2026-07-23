@@ -27,6 +27,7 @@ const markdownSerializer = new MarkdownSerializer(
     listItem: defaultMarkdownSerializer.nodes.list_item,
     horizontalRule: defaultMarkdownSerializer.nodes.horizontal_rule,
     hardBreak: defaultMarkdownSerializer.nodes.hard_break,
+    image: defaultMarkdownSerializer.nodes.image,
     text: defaultMarkdownSerializer.nodes.text,
     codeBlock: (state, node) => {
       state.write(`\`\`\`${node.attrs.language ?? ""}\n`);

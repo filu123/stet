@@ -48,7 +48,7 @@ export function Sidebar({ isOpen, isMobile, onToggle }: SidebarProps) {
               {/* The squiggle is absolutely positioned so only the word sets the
                   column width — the underline then spans exactly "Stet". */}
               <div className="relative inline-flex flex-col pb-2" aria-label="Stet">
-                <span className="font-logo text-3xl leading-none tracking-tight">Stet</span>
+                <span className="text-2xl leading-none font-bold tracking-tight">Stet</span>
                 <svg
                   viewBox="0 0 100 6"
                   preserveAspectRatio="none"

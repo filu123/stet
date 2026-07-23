@@ -62,7 +62,12 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
           <House className="size-4" aria-hidden />
         </Link>
         <ChevronRight className="size-3.5 shrink-0" aria-hidden />
-        <span>Documents</span>
+        <Link
+          href="/documents"
+          className="rounded-md px-1 transition-colors hover:text-content-primary"
+        >
+          Documents
+        </Link>
         {document && (
           <>
             <ChevronRight className="size-3.5 shrink-0" aria-hidden />

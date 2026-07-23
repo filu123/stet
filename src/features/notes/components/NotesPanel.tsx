@@ -74,7 +74,7 @@ export function NotesPanel({ editor, notes }: NotesPanelProps) {
 
         <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-3">
           {draft && (
-            <div className="flex flex-col gap-2.5 rounded-xl border border-accent bg-accent-soft p-3">
+            <div className="flex flex-col gap-2.5 rounded-xl border border-border-subtle bg-surface-card p-3">
               <div className="flex items-start gap-2">
                 <span className="w-0.5 shrink-0 self-stretch rounded-full bg-note-anchor" aria-hidden />
                 <span className="line-clamp-2 text-xs text-content-tertiary italic">
