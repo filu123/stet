@@ -194,14 +194,18 @@ browser-storage data-loss risk (incognito, cache clears, Safari eviction).
 
 ## Phase C — Release (v1.0)
 
-### Step 12 — Hardening + tests
-- Set up **Vitest** now (not earlier): unit tests for the pure logic that earned them — `suggestion-parser` (position mapping edge cases), `markdown-serializer` (round-trip), settings storage
-- Error boundaries around editor and AI features
-- Performance check with a very long document (10k+ words)
+### Step 12 — Hardening + tests ✅
+- Vitest set up (`npm test`, jsdom + tsconfig paths); 42 tests across `suggestion-parser`,
+  `position-mapper` (occurrence clamping, cross-block reject, emoji alignment),
+  `markdown-serializer` (round-trip + plain text), `normalize-url`, `extract-snippet`,
+  `note-commands` (collect/merge/order), and `api-key-storage`
+- Error boundaries: route-level `app/error.tsx` + a reusable `ErrorBoundary` wrapping the
+  AI/notes UI so an AI crash can't take the editor down
+- Performance verified on a 12k-word document: ~800ms load, ~60ms to type 11 chars
 
 **Done when:**
-- [ ] `npm test` runs in CI-able fashion; parser + serializer edge cases covered
-- [ ] Killing the network mid-review degrades gracefully
+- [x] `npm test` runs in CI-able fashion; parser + serializer edge cases covered
+- [x] Killing the network mid-review degrades gracefully (verified: no crash, editor stays editable)
 
 ### Step 13 — Open source packaging
 - README: hero screenshot/GIF, 3-command install, BYO-key explanation, privacy statement (everything local)

@@ -3,6 +3,7 @@
 import { useEffect, type MouseEvent } from "react";
 
 import { DocumentCard } from "@/components/ui/DocumentCard";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { Toast } from "@/components/ui/Toast";
 import { AiAssistantButton, SuggestionPopover, useProactiveReview } from "@/features/ai-assistant";
 import { DocumentTitleInput } from "@/features/documents";
@@ -100,11 +101,12 @@ export function EditorScreen({ document }: EditorScreenProps) {
       </DocumentCard>
 
       {editor && (
-        <>
+        // An AI crash must never take the editor down with it.
+        <ErrorBoundary fallback={() => null}>
           <NotesPanel editor={editor} notes={notes} />
           <AiAssistantButton editor={editor} isNotesPanelOpen={isPanelOpen} />
           <SuggestionPopover editor={editor} />
-        </>
+        </ErrorBoundary>
       )}
 
       <Toast message="Saved automatically ✓" isVisible={isSaveToastVisible} />
