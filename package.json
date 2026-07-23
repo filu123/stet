@@ -18,6 +18,7 @@
     "dexie": "^4.4.4",
     "dexie-react-hooks": "^4.4.0",
     "lucide-react": "^1.25.0",
+    "mammoth": "^1.12.0",
     "marked": "^18.0.7",
     "next": "16.2.11",
     "prosemirror-markdown": "^1.13.5",

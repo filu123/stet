@@ -14,7 +14,8 @@ import {
 } from "@/features/documents";
 import {
   exportDocumentAsMarkdown,
-  importMarkdownAsNewDocument,
+  IMPORTABLE_EXTENSIONS,
+  importFileAsNewDocument,
 } from "@/features/editor";
 import { SettingsDialog } from "@/features/settings";
 
@@ -36,7 +37,7 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
     if (!file) return;
 
     try {
-      const newDocumentId = await importMarkdownAsNewDocument(file);
+      const newDocumentId = await importFileAsNewDocument(file);
       router.push(`/document/${newDocumentId}`);
     } catch (error) {
       window.alert(error instanceof Error ? error.message : "Import failed.");
@@ -89,8 +90,8 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
           </button>
         )}
         <IconButton
-          aria-label="Import Markdown file"
-          title="Import Markdown file"
+          aria-label="Import file"
+          title="Import file (Markdown, text, HTML, Word)"
           onClick={() => fileInputRef.current?.click()}
         >
           <Upload className="size-4" aria-hidden />
@@ -105,7 +106,7 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".md,.markdown,.txt"
+          accept={IMPORTABLE_EXTENSIONS}
           className="hidden"
           onChange={handleImportFileChange}
         />

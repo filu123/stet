@@ -62,6 +62,10 @@ export function documentContentToMarkdown(content: TipTapJsonContent | null): st
 }
 
 export function markdownToDocumentContent(markdown: string): TipTapJsonContent {
-  const html = marked.parse(markdown, { async: false });
+  return htmlToDocumentContent(marked.parse(markdown, { async: false }));
+}
+
+/** Any HTML → TipTap JSON through the editor's own schema (import pipeline core). */
+export function htmlToDocumentContent(html: string): TipTapJsonContent {
   return generateJSON(html, buildEditorExtensions());
 }

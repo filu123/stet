@@ -5,5 +5,6 @@
 export { EditorScreen } from "./components/EditorScreen";
 export {
   exportDocumentAsMarkdown,
-  importMarkdownAsNewDocument,
+  IMPORTABLE_EXTENSIONS,
+  importFileAsNewDocument,
 } from "./lib/markdown-transfer";
