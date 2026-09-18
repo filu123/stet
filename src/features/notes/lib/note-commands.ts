@@ -1,6 +1,7 @@
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import type { Editor } from "@tiptap/react";
 
+import { randomId } from "@/lib/utils/random-id";
 import { useNotesUiStore } from "@/stores/notes-ui-store";
 
 import type { AnchoredNote, NoteMessage } from "./note-types";
@@ -11,7 +12,7 @@ interface Range {
 }
 
 export function createId(): string {
-  return crypto.randomUUID();
+  return randomId();
 }
 
 export function nowIso(): string {

@@ -1,4 +1,5 @@
 import { database } from "@/lib/db/database";
+import { randomId } from "@/lib/utils/random-id";
 import type { EditorDocument, FolderSummary, TipTapJsonContent } from "@/types/document";
 
 /**
@@ -14,7 +15,7 @@ function normalizeDocument(document: EditorDocument): EditorDocument {
 export async function createDocument(title = "Untitled"): Promise<EditorDocument> {
   const now = new Date();
   const document: EditorDocument = {
-    id: crypto.randomUUID(),
+    id: randomId(),
     title,
     content: null,
     folderName: null,

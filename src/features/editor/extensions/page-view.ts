@@ -1,5 +1,5 @@
 import { Extension, type Editor } from "@tiptap/core";
-import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Plugin, PluginKey, type EditorState } from "@tiptap/pm/state";
 import { Decoration, DecorationSet, type EditorView } from "@tiptap/pm/view";
 
 /**
@@ -16,11 +16,16 @@ export const PAPER_CONTENT_HEIGHTS = { a4: 987, letter: 920 } as const;
 export const PAGE_GAP_HEIGHT = 48;
 
 /** White breathing room at the top of each new sheet. */
-const PAGE_TOP_PADDING = 44;
+export const PAGE_TOP_PADDING = 44;
 
 interface PageViewConfig {
   pageHeight: number;
   gapHeight: number;
+  /**
+   * White breathing room at the top of each new sheet. Book mode passes 0 so
+   * one sheet is exactly `pageHeight` tall and paging is a clean translate.
+   */
+  topPadding?: number;
 }
 
 interface PageSpacer {
@@ -28,10 +33,12 @@ interface PageSpacer {
   /** White space finishing the current sheet (varies per page). */
   fillerHeight: number;
   gapHeight: number;
+  topPadding: number;
 }
 
 interface PageViewState {
   config: PageViewConfig | null;
+  spacers: PageSpacer[];
   decorations: DecorationSet;
 }
 
@@ -49,22 +56,35 @@ export const PageViewExtension = Extension.create({
       new Plugin<PageViewState>({
         key: pageViewPluginKey,
         state: {
-          init: () => ({ config: null, decorations: DecorationSet.empty }),
+          init: () => ({ config: null, spacers: [], decorations: DecorationSet.empty }),
           apply(tr, pluginState) {
             const meta = tr.getMeta(pageViewPluginKey) as PageViewMeta | undefined;
             if (meta?.type === "config") {
               return {
                 config: meta.config,
+                spacers: meta.config ? pluginState.spacers : [],
                 decorations: meta.config
                   ? pluginState.decorations.map(tr.mapping, tr.doc)
                   : DecorationSet.empty,
               };
             }
             if (meta?.type === "spacers") {
-              return { ...pluginState, decorations: createSpacerDecorations(tr.doc, meta.spacers) };
+              return {
+                ...pluginState,
+                spacers: meta.spacers,
+                decorations: createSpacerDecorations(tr.doc, meta.spacers),
+              };
             }
+            // Keep positions honest between measurements (the controller is
+            // debounced, so an edit lands before the next spacer pass).
             return {
               ...pluginState,
+              spacers: tr.docChanged
+                ? pluginState.spacers.map((spacer) => ({
+                    ...spacer,
+                    pos: tr.mapping.map(spacer.pos),
+                  }))
+                : pluginState.spacers,
               decorations: pluginState.decorations.map(tr.mapping, tr.doc),
             };
           },
@@ -82,9 +102,29 @@ export const PageViewExtension = Extension.create({
 
 /** Turns page view on (with sizes) or off. Called by the editor screen. */
 export function setPageView(editor: Editor, config: PageViewConfig | null): void {
+  const current = pageViewPluginKey.getState(editor.state)?.config ?? null;
+  if (isSameConfig(current, config)) return;
   editor.view.dispatch(
     editor.state.tr.setMeta(pageViewPluginKey, { type: "config", config }),
   );
+}
+
+function isSameConfig(a: PageViewConfig | null, b: PageViewConfig | null): boolean {
+  if (!a || !b) return a === b;
+  return (
+    a.pageHeight === b.pageHeight &&
+    a.gapHeight === b.gapHeight &&
+    (a.topPadding ?? PAGE_TOP_PADDING) === (b.topPadding ?? PAGE_TOP_PADDING)
+  );
+}
+
+/**
+ * Doc positions where each page after the first begins, ascending — the page
+ * breaks the last measurement found. Book mode reads this to count pages and
+ * to tell which page the cursor is on.
+ */
+export function getPageBreakPositions(state: EditorState): number[] {
+  return pageViewPluginKey.getState(state)?.spacers.map((spacer) => spacer.pos) ?? [];
 }
 
 function createSpacerDecorations(doc: import("@tiptap/pm/model").Node, spacers: PageSpacer[]) {
@@ -108,12 +148,15 @@ function createSpacerDecorations(doc: import("@tiptap/pm/model").Node, spacers: 
           band.style.height = `${spacer.gapHeight}px`;
 
           const topPadding = document.createElement("div");
-          topPadding.style.height = `${PAGE_TOP_PADDING}px`;
+          topPadding.style.height = `${spacer.topPadding}px`;
 
           element.append(filler, band, topPadding);
           return element;
         },
-        { side: -1, key: `page-gap-${spacer.pos}-${spacer.fillerHeight}` },
+        {
+          side: -1,
+          key: `page-gap-${spacer.pos}-${spacer.fillerHeight}-${spacer.gapHeight}-${spacer.topPadding}`,
+        },
       ),
     ),
   );
@@ -159,7 +202,7 @@ class PageViewController {
       this.dispatchSpacers([]);
       return;
     }
-    const { pageHeight, gapHeight } = pluginState.config;
+    const { pageHeight, gapHeight, topPadding = PAGE_TOP_PADDING } = pluginState.config;
 
     // Map top-level doc nodes to their positions.
     const blockPositions: number[] = [];
@@ -196,6 +239,7 @@ class PageViewController {
             pos,
             fillerHeight: Math.max(0, Math.round(pageBoundary - naturalTop)),
             gapHeight,
+            topPadding,
           });
           pageBoundary = naturalTop + pageHeight;
         } else {

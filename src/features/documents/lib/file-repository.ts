@@ -1,3 +1,4 @@
+import { randomId } from "@/lib/utils/random-id";
 import type { EditorDocument, FolderSummary, TipTapJsonContent } from "@/types/document";
 
 /**
@@ -39,7 +40,7 @@ async function putDocumentPatch(
 
 export async function createDocument(title = "Untitled"): Promise<EditorDocument> {
   const now = new Date().toISOString();
-  const saved = await putDocumentPatch(crypto.randomUUID(), {
+  const saved = await putDocumentPatch(randomId(), {
     title,
     content: null,
     createdAt: now,

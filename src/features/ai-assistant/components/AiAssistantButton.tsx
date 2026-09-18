@@ -9,6 +9,8 @@ import { useAiReviewStore } from "@/stores/ai-review-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import { readApiKey } from "@/features/settings";
 import { cn } from "@/lib/utils/cn";
+import { randomId } from "@/lib/utils/random-id";
+import type { AiChatMessage } from "../lib/ask-service";
 
 import { addAiMarkup, clearAiMarkup, showAiMarkup } from "../lib/ai-markup-extension";
 import { buildDocumentTextIndex, resolveQuoteRange } from "../lib/position-mapper";
@@ -29,6 +31,7 @@ export function AiAssistantButton({ editor, isNotesPanelOpen = false }: AiAssist
   const clearReview = useAiReviewStore((state) => state.clearReview);
   const [isContinuing, setIsContinuing] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<AiChatMessage[]>([]);
 
   // Fresh document (component remounts per doc) → no stale review state.
   useEffect(() => {
@@ -94,7 +97,7 @@ export function AiAssistantButton({ editor, isNotesPanelOpen = false }: AiAssist
       const range = resolveQuoteRange(newIndex, continuation, Number.MAX_SAFE_INTEGER);
       if (range) {
         const suggestion = {
-          id: crypto.randomUUID(),
+          id: randomId(),
           kind: "highlight" as const,
           quote: continuation,
           occurrence: 1,
@@ -117,7 +120,7 @@ export function AiAssistantButton({ editor, isNotesPanelOpen = false }: AiAssist
   return (
     <div
       className={cn(
-        "print-hidden fixed right-6 bottom-6 z-40 flex items-center gap-2 transition-transform duration-300",
+        "ai-assistant-dock print-hidden fixed right-6 bottom-6 z-40 flex items-center gap-2 transition-transform duration-300",
         isNotesPanelOpen && "md:-translate-x-80",
       )}
     >
@@ -199,6 +202,8 @@ export function AiAssistantButton({ editor, isNotesPanelOpen = false }: AiAssist
             <div className="fixed inset-0 z-30" aria-hidden onClick={() => setIsMenuOpen(false)} />
             <AiActionMenu
               editor={editor}
+              chatMessages={chatMessages}
+              onChatMessagesChange={setChatMessages}
               onAnalyze={() => void handleReviewClick()}
               onClose={() => setIsMenuOpen(false)}
             />

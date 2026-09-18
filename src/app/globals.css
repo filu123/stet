@@ -383,6 +383,30 @@ body {
   background-color: var(--note-anchor-bg-active);
 }
 
+/* Stylus markup. While an S Pen is hovering, the editor opts out of browser
+   panning so a pen sweep draws instead of scrolling; finger scrolling returns
+   as soon as the pen leaves hover range (see extensions/pen-markup.ts). */
+.tiptap-content.pen-hovering {
+  touch-action: none;
+}
+
+/* Live preview of the stroke in progress — committed as a real mark on lift.
+   Background color is set inline from the chosen pen color. */
+.tiptap-content .pen-stroke-apply {
+  border-radius: 5px;
+  opacity: 0.75;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.tiptap-content .pen-stroke-erase {
+  background-color: var(--surface-hover);
+  border-radius: 5px;
+  opacity: 0.6;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 /* User-applied underline; decoration color comes from the mark's color attr */
 .tiptap-content u {
   text-decoration-thickness: 1.5px;
@@ -511,6 +535,732 @@ body {
 .document-card .tiptap-content,
 .document-card input[aria-label="Document title"] {
   font-family: var(--doc-font);
+}
+
+/* ---------------------------------------------------------------------------
+ * Book mode: one screen-sized sheet at a time, turned instead of scrolled.
+ *
+ * The page-view plugin does the pagination (configured with no gap and no top
+ * padding), so every sheet is exactly one window tall and the whole stack is
+ * moved by a single translate. Only the framing changes — the editor, its
+ * selection, highlights and pen strokes are the same ones as in normal view.
+ * ------------------------------------------------------------------------- */
+
+.book-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-app);
+}
+
+.book-stage .book-page-area {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
+  /* Depth for the turning page. */
+  perspective: 2200px;
+}
+
+/* The sheet IS the screen: no gutter, no corners, no border to read past.
+   The page-width preference becomes the text column inside it, so a wide
+   monitor gives wide margins rather than a 2000px line. */
+.book-stage .document-card {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  padding-block: 3rem 2rem;
+  padding-inline: max(2rem, calc((100% - var(--book-measure, 45rem)) / 2));
+}
+
+@media (min-width: 640px) {
+  .book-stage .document-card {
+    padding-block: 3.5rem 2.5rem;
+  }
+}
+
+.book-stage .editor-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* The one-page window. Its height is set from the measured body, and the
+   stack inside is pushed up by whole pages. */
+.book-stage .book-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* No transition on the offset. The stack jumps a whole page instantly, hidden
+   under the turning copy — animating it would read as scrolling, not turning. */
+.book-stage .book-pages {
+  will-change: transform;
+}
+
+/* No band between sheets: the sheet is the screen. The hairlines have to go
+   too — 2px per break would push every page a little further out of the
+   window than the last. */
+.book-stage .tiptap-content .page-gap .page-gap-band {
+  border: none;
+  background: none;
+}
+
+/* Manual page breaks are real breaks here, not a labelled line. */
+.book-stage .tiptap-content .page-break::after {
+  content: none;
+}
+
+/* ----- The turn ------------------------------------------------------------
+ * A real page turn shows two pages at once. The live editor jumps straight to
+ * the new page and an inert copy of the old one (built in `page-ghost.ts`)
+ * turns over it. The movement itself is scripted in `useBookMode` rather than
+ * declared here: a page turned twice in a row has to replay it, and a CSS
+ * animation whose selector never stopped matching would not.
+ * ------------------------------------------------------------------------- */
+
+/* The selection menu is placed by floating-ui, but only once it has measured.
+   Out of flow from the first frame, so being appended to the stage (a flex
+   column) never counts as layout, even for one frame. */
+.bubble-menu-floating {
+  position: absolute;
+}
+
+.book-ghost-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  perspective: 2200px;
+}
+
+/* Turning forward the old page lies on top of the new one; turning back it
+   waits underneath while the page you asked for comes down over it. */
+.book-ghost-layer[data-turn="forward"] {
+  z-index: 2;
+}
+
+.book-ghost-layer[data-turn="back"] {
+  z-index: 0;
+}
+
+.book-ghost {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  backface-visibility: hidden;
+}
+
+.book-stage .book-bar {
+  background: var(--surface-card);
+  color: var(--text-secondary);
+}
+
+.book-scrubber {
+  appearance: none;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--border-subtle);
+  cursor: pointer;
+}
+
+.book-scrubber::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.book-scrubber::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.book-scrubber:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* Floating tools sit above the reading bar rather than on top of it. */
+.book-stage ~ .pen-markup-palette,
+.book-stage ~ .ai-assistant-dock {
+  bottom: 4.5rem;
+}
+
+/* Tap strips down each side of the page — wide enough to hit without looking,
+   narrow enough to leave the text column to the reader. */
+.book-turn-zone {
+  width: clamp(3rem, 16%, 11rem);
+}
+
+/* ---------------------------------------------------------------------------
+ * Reader — a separate surface from the editor: a phone, held in one hand, one
+ * piece of a novel at a time.
+ *
+ * Everything here assumes touch. There is no hover to reveal anything, the
+ * safe areas are real (notch, home indicator), and the thumb only reliably
+ * reaches the bottom two-thirds.
+ * ------------------------------------------------------------------------- */
+
+.reader-stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-app);
+  /* The reading surface takes every gesture; the browser must not also try to
+     scroll, zoom, or select behind it. */
+  overscroll-behavior: none;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.reader-surface {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Chrome pans the page for stylus drags unless `touch-action` was already
+   `none` when the gesture began — too late to set it on pointerdown. The pen
+   announces itself by hovering, so the class goes on as it approaches and a
+   finger keeps scrolling as usual. */
+.reader-surface.pen-hovering {
+  touch-action: none;
+}
+
+/* Selection is left switched on for the prose and switched off only for the
+   parts that are not prose. The reverse — off everywhere, back on for
+   paragraphs — reads more tidily but WebKit has never reliably honoured a
+   descendant re-enabling it, and unselectable text is unhighlightable text. */
+.reader-tail,
+.reader-heading,
+.reader-scene-break,
+.reader-footer,
+.reader-topbar {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.reader-paragraph,
+.reader-quote {
+  -webkit-user-select: text;
+  user-select: text;
+  /* iOS: the long-press callout is what raises the selection in the first
+     place, so it must not be suppressed here. */
+  -webkit-touch-callout: default;
+}
+
+.reader-measure {
+  width: 100%;
+  max-width: 34em;
+  margin: 0 auto;
+}
+
+.reader-paragraph,
+.reader-tail,
+.reader-heading {
+  font-family: var(--font-lora), Georgia, serif;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.reader-paragraph + .reader-paragraph {
+  margin-top: 0.9em;
+}
+
+.reader-heading {
+  font-size: 0.85em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+/* A letter, a telegram, a journal entry inside the story — epistolary novels
+   are full of them, and they should read as set apart. */
+.reader-quote {
+  border-left: 2px solid var(--border-subtle);
+  padding-left: 0.9em;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Bold in a novel is emphasis, not a heading: weight, not shouting. */
+.reader-strong {
+  font-weight: 600;
+}
+
+.reader-scene-break {
+  margin: 1.4em 0 0.2em;
+  text-align: center;
+  letter-spacing: 0.6em;
+  color: var(--text-tertiary);
+}
+
+/* ----- Step: one piece, alone, in the middle of the screen ---------------- */
+
+.reader-step {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.5rem 1.5rem 2rem;
+  overflow-y: auto;
+  animation: reader-step-in 220ms ease-out;
+}
+
+@keyframes reader-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The thread back to the sentence before — enough to place yourself, not
+   enough to read instead. */
+.reader-tail {
+  max-width: 34em;
+  margin: 0 auto 1.6em;
+  font-size: 0.78em;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  opacity: 0.7;
+}
+
+/* ----- Spotlight: the page stays, the light moves ------------------------- */
+
+.reader-spotlight {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 45vh 1.5rem;
+}
+
+.reader-spotlight-chunk {
+  transition:
+    opacity 260ms ease,
+    filter 260ms ease;
+  opacity: 0.28;
+  filter: blur(0.4px);
+}
+
+.reader-spotlight-chunk.is-active {
+  opacity: 1;
+  filter: none;
+}
+
+.reader-spotlight-chunk + .reader-spotlight-chunk {
+  margin-top: 0.9em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reader-step,
+  .reader-spotlight-chunk {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* A reader's mark. The colour is inline (it is data, not design), so only the
+   shape belongs here. */
+.reader-highlight {
+  color: inherit;
+  border-radius: 3px;
+  padding: 0.05em 0;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* The pacer's light. A guide, not a spotlight: it has to be findable at a
+   glance without becoming the thing you are looking at instead of the word. */
+.reader-paced-word {
+  border-radius: 3px;
+  background: var(--accent-soft);
+  box-shadow: 0 1.5px 0 var(--accent);
+  transition: background-color 90ms linear;
+}
+
+.reader-pacer-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: calc(3.25rem + env(safe-area-inset-bottom));
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-inline: auto;
+  width: min(20rem, calc(100vw - 2rem));
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--surface-card);
+}
+
+.reader-pacer-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  color: var(--text-secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reader-paced-word {
+    transition: none;
+  }
+}
+
+.reader-highlight-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 40;
+  padding: 0.85rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  background: var(--surface-card);
+  border-top: 1px solid var(--border-subtle);
+  animation: reader-sheet-in 180ms ease-out;
+}
+
+.reader-highlight-quote {
+  font-family: var(--font-lora), Georgia, serif;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ----- Page: no focus aid, as much of the book as the screen holds -------- */
+
+.reader-page {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 1.25rem 1.5rem;
+}
+
+.reader-page-chunk + .reader-page-chunk {
+  margin-top: 0.9em;
+}
+
+/* Kept in the layout so the measurements stay honest, but never shown: a
+   sliced half-line at the fold is the thing page mode exists to avoid. */
+.reader-page-chunk.is-overflow {
+  visibility: hidden;
+}
+
+/* ----- Chrome ------------------------------------------------------------- */
+
+.reader-topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-subtle);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+  opacity: 0;
+  transform: translateY(-100%);
+  position: absolute;
+  inset-inline: 0;
+  top: env(safe-area-inset-top);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.reader-topbar.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.reader-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/* The finish line never hides: it is the reason to keep going. It is also the
+   way into the settings, since the top chrome is discoverable only by knowing
+   it is there. */
+.reader-footer {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem 0.75rem;
+  background: var(--surface-app);
+  text-align: left;
+}
+
+.reader-footer:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.reader-progress {
+  display: block;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+
+.reader-progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 240ms ease;
+}
+
+.reader-contents-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.reader-contents-row.is-current {
+  color: var(--text-primary);
+  background: var(--accent-soft);
+}
+
+.reader-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* ----- Resume ------------------------------------------------------------- */
+
+.reader-resume {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+.reader-resume-quote {
+  margin-top: 1.5rem;
+  font-family: var(--font-lora), Georgia, serif;
+  font-size: 0.95em;
+  line-height: 1.6;
+  color: var(--text-tertiary);
+  border-left: 2px solid var(--border-subtle);
+  padding-left: 0.9rem;
+}
+
+.reader-resume-button,
+.reader-primary-button,
+.reader-enrich-button {
+  margin-top: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--accent);
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.reader-primary-button,
+.reader-enrich-button {
+  margin-top: 0;
+  font-size: 0.875rem;
+}
+
+.reader-primary-button:disabled,
+.reader-enrich-button:disabled {
+  opacity: 0.6;
+}
+
+/* ----- Sheets and panels -------------------------------------------------- */
+
+.reader-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: var(--overlay);
+}
+
+.reader-sheet {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 40;
+  padding: 1rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
+  background: var(--surface-card);
+  border-top: 1px solid var(--border-subtle);
+  border-radius: 1rem 1rem 0 0;
+  animation: reader-sheet-in 200ms ease-out;
+}
+
+@keyframes reader-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.reader-sheet-legend {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.reader-choice {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  text-align: left;
+  color: var(--text-secondary);
+}
+
+.reader-choice.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--text-primary);
+}
+
+.reader-panel {
+  position: fixed;
+  inset-block: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  width: min(22rem, 88vw);
+  flex-direction: column;
+  background: var(--surface-card);
+  border-left: 1px solid var(--border-subtle);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  animation: reader-panel-in 200ms ease-out;
+}
+
+@keyframes reader-panel-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.reader-character {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.reader-character-quote {
+  margin-top: 0.25rem;
+  display: block;
+  font-family: var(--font-lora), Georgia, serif;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
+.reader-hint {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--overlay);
+}
+
+.reader-hint-card {
+  width: 100%;
+  max-width: 20rem;
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+}
+
+/* ----- Shelf -------------------------------------------------------------- */
+
+.reader-shelf-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  background: var(--surface-callout);
+  color: var(--text-secondary);
+}
+
+.reader-shelf-progress {
+  margin-top: 0.4rem;
+  display: block;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+
+.reader-shelf-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
 }
 
 /* ---------------------------------------------------------------------------

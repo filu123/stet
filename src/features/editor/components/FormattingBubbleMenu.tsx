@@ -58,7 +58,18 @@ export function FormattingBubbleMenu({ editor }: FormattingBubbleMenuProps) {
   });
 
   return (
-    <BubbleMenu editor={editor} options={{ placement: "top", offset: 8 }}>
+    <BubbleMenu
+      editor={editor}
+      options={{ placement: "top", offset: 8 }}
+      className="bubble-menu-floating"
+      // Book mode clips the document to one sheet; a menu mounted inside that
+      // window would be cut off above the first line. Hoist it to the stage
+      // there, and leave it exactly where it was everywhere else.
+      appendTo={() =>
+        (editor.view.dom.closest(".book-stage") as HTMLElement | null) ??
+        (editor.view.dom.parentElement as HTMLElement)
+      }
+    >
       <div className="flex items-center gap-0.5 rounded-xl border border-border-subtle bg-surface-card p-1">
         <ToolbarButton
           label="Bold"

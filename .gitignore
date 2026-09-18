@@ -47,3 +47,6 @@ CLAUDE.md
 # Raw screen recordings (kept local; processed into docs/screenshots)
 *.mov
 *.mp4
+
+# Full books downloaded for the reader's real-novel test (see real-book.test.ts)
+.local-books/
