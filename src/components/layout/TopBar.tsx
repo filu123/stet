@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ChangeEvent } from "react";
 
-import { ChevronRight, House, PanelLeft, Settings, Upload } from "lucide-react";
+import { ChevronRight, House, Maximize2, PanelLeft, Settings, Upload } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +15,8 @@ import {
 } from "@/features/documents";
 import { IMPORTABLE_EXTENSIONS, importFileAsNewDocument } from "@/features/editor";
 import { SettingsDialog } from "@/features/settings";
+import { requestBrowserFullscreen } from "@/lib/utils/fullscreen";
+import { useFocusModeStore } from "@/stores/focus-mode-store";
 
 interface TopBarProps {
   isSidebarOpen: boolean;
@@ -27,6 +29,13 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const setFocusMode = useFocusModeStore((state) => state.setFocusMode);
+
+  // Requested straight from the click: fullscreen needs the user gesture.
+  const handleEnterFocusMode = () => {
+    setFocusMode(true);
+    requestBrowserFullscreen();
+  };
 
   const handleImportFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,6 +105,16 @@ export function TopBar({ isSidebarOpen, onToggleSidebar }: TopBarProps) {
         >
           <Settings className="size-4" aria-hidden />
         </IconButton>
+        {/* Document-only: the way back out lives in the editor's toolbar row. */}
+        {document && (
+          <IconButton
+            aria-label="Focus mode"
+            title="Focus mode — hide everything but the document"
+            onClick={handleEnterFocusMode}
+          >
+            <Maximize2 className="size-4" aria-hidden />
+          </IconButton>
+        )}
         <input
           ref={fileInputRef}
           type="file"

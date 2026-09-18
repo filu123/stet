@@ -11,3 +11,5 @@ export {
   exportDocumentAsPlainText,
 } from "./lib/export-service";
 export { IMPORTABLE_EXTENSIONS, importFileAsNewDocument } from "./lib/markdown-transfer";
+// Lets the reader take a document off the shelf next door and read it.
+export { documentContentToMarkdown } from "./lib/markdown-serializer";

@@ -29,10 +29,12 @@ Most “AI writing tools” either rewrite your text for you or bury edits in a 
 
 - ✍️ **Rich text editor** (TipTap) — headings, lists, quotes, code, links, emoji, images, page breaks
 - 🤖 **AI review** — grammar fixes, style suggestions, highlights, and circled passages you accept or dismiss
+- 🎙️ **Gemini Live voice conversations** — talk naturally with a document and hear spoken answers grounded in its content
 - 🖊️ **Human markup tools** — highlight, colored underline, circle, all as real document marks
 - 💬 **Notes** — Google-Docs-style comments anchored to text, in a right-side panel
 - 🖼️ **Images** — insert, paste, or drag-and-drop; stored on disk beside your docs
 - 📄 **Pages & typography** — continuous or paginated (A4/Letter), free-form width, four document fonts, text-size control
+- 📖 **Book mode** — fullscreen, one screen-sized page at a time, turning over like paper; swipe, tap either side of the page, or use the keyboard, and jump to any page. Still fully editable: highlight, note, pen and AI all work on the page in front of you
 - 📁 **Folders & library** — a Home dashboard and a card-grid `/documents` view
 - 📤 **Export** — Markdown, Word (`.docx`), HTML, plain text, and PDF
 - 📥 **Import** — Markdown, text, HTML, and Word (`.docx`)
@@ -57,6 +59,10 @@ npm run dev
 Open <http://localhost:3000> and start writing. That’s it — documents are saved to `~/Stet` automatically.
 
 To use the AI features, open **Settings** (gear icon, top-right), choose a provider, and paste your API key.
+Voice conversations currently use Gemini Live and also require microphone permission in the browser. On a
+phone or tablet, the page must be opened over HTTPS; `http://localhost:3000` works on the development
+computer, but an `http://192.168.x.x:3000` address opened from another device is not a secure context and
+cannot access its microphone. The hosted demo is already HTTPS.
 
 ### Where your documents live
 
@@ -82,7 +88,7 @@ Everything stays client-side and BYO-key — a hosted Stet never sees your docum
 
 - **No telemetry, no analytics, no accounts.** Stet never phones home.
 - **Your API key** is read from `localStorage` at call time and sent only to the provider you chose. It never enters a document, an export, a log, or an error message.
-- **Your writing** stays on your machine. The only text that leaves is what you send to your AI provider when you run a review — using your own key, under their policy.
+- **Your writing** stays on your machine until you use an AI feature. Text is sent only to the AI provider you selected when you ask for help; during a Gemini Live voice session, microphone audio is streamed to Gemini and spoken responses are streamed back, using your own key and under Google's policy.
 
 ## Tech
 

@@ -1,5 +1,6 @@
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 
+import { randomId } from "@/lib/utils/random-id";
 import type { AiSettings } from "@/types/ai";
 
 import type { RawSuggestion, Suggestion } from "../types";
@@ -37,7 +38,7 @@ export async function requestDocumentReview(
 
 function toSuggestion(rawSuggestion: RawSuggestion, from: number, to: number): Suggestion {
   const common = {
-    id: crypto.randomUUID(),
+    id: randomId(),
     quote: rawSuggestion.quote,
     occurrence: rawSuggestion.occurrence,
     note: rawSuggestion.note,

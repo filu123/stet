@@ -1,6 +1,7 @@
 "use client";
 
-import { PanelLeftClose } from "lucide-react";
+import { BookOpen, PanelLeftClose } from "lucide-react";
+import Link from "next/link";
 
 import { IconButton } from "@/components/ui/IconButton";
 import { cn } from "@/lib/utils/cn";
@@ -79,6 +80,16 @@ export function Sidebar({ isOpen, isMobile, onToggle }: SidebarProps) {
           </header>
 
           <SidebarDocumentList />
+
+          {/* The reader is its own surface — phone-first, its own storage —
+              but it still needs one door into it from the desk app. */}
+          <Link
+            href="/read"
+            className="mx-3 mb-3 flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-content-secondary transition-colors hover:bg-surface-hover hover:text-content-primary"
+          >
+            <BookOpen className="size-4" aria-hidden />
+            Reading
+          </Link>
         </div>
       </aside>
     </>

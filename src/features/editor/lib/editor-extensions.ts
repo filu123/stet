@@ -11,6 +11,7 @@ import { CircleMark } from "../extensions/circle-mark";
 import { ColoredUnderline } from "../extensions/colored-underline";
 import { PageBreak } from "../extensions/page-break";
 import { PageViewExtension } from "../extensions/page-view";
+import { PenMarkup } from "../extensions/pen-markup";
 
 /**
  * The single source of truth for the editor's schema.
@@ -38,6 +39,8 @@ export function buildEditorExtensions(): Extensions {
     NoteMark,
     PageBreak,
     PageViewExtension,
+    // Stylus highlighting — plugin only, no schema impact (like AiMarkupExtension).
+    PenMarkup,
     Placeholder.configure({ placeholder: "Start writing…" }),
     AiMarkupExtension,
   ];

@@ -1,37 +1,14 @@
 "use client";
 
-import { useState } from "react";
-
-import {
-  Bold,
-  Circle,
-  Code,
-  Heading1,
-  Heading2,
-  Heading3,
-  Highlighter,
-  Italic,
-  List,
-  ListOrdered,
-  Minus,
-  Redo2,
-  SeparatorHorizontal,
-  SquareCode,
-  Strikethrough,
-  TextQuote,
-  Underline,
-  Undo2,
-} from "lucide-react";
+import { Redo2, Undo2 } from "lucide-react";
 import { useEditorState, type Editor } from "@tiptap/react";
 
 import { ToolbarButton } from "@/components/ui/ToolbarButton";
 import { ToolbarDivider } from "@/components/ui/ToolbarDivider";
 
-import { EmojiControl } from "./EmojiControl";
+import { BookModeButton } from "./BookModeButton";
 import { FontControl } from "./FontControl";
-import { ImageControl } from "./ImageControl";
-import { LinkControl } from "./LinkControl";
-import { MarkColorSwatches } from "./MarkColorSwatches";
+import { LastHighlightButton } from "./LastHighlightButton";
 import { PageSetupControl } from "./PageSetupControl";
 import { PageWidthControl } from "./PageWidthControl";
 
@@ -40,44 +17,26 @@ interface EditorToolbarProps {
 }
 
 /**
- * Fixed docx-style formatting toolbar — always visible above the document.
- * Flat surface, hairline border, no shadow (AGENTS.md).
+ * The fixed toolbar above the document — deliberately minimal.
+ *
+ * Text formatting lives in the selection bubble menu, not here: on a tablet
+ * you mark up far more than you restyle, so the bar keeps only history,
+ * navigation, and page-level settings. Flat surface, hairline border, no
+ * shadow (AGENTS.md).
  */
 export function EditorToolbar({ editor }: EditorToolbarProps) {
-  const [openColorPicker, setOpenColorPicker] = useState<
-    "underline" | "circle" | "highlight" | null
-  >(null);
   const state = useEditorState({
     editor,
     selector: ({ editor: editorInstance }) => ({
       canUndo: editorInstance.can().undo(),
       canRedo: editorInstance.can().redo(),
-      isBold: editorInstance.isActive("bold"),
-      isItalic: editorInstance.isActive("italic"),
-      isStrike: editorInstance.isActive("strike"),
-      isUnderline: editorInstance.isActive("underline"),
-      isCircle: editorInstance.isActive("circle"),
-      isHighlighted: editorInstance.isActive("highlight"),
-      isLink: editorInstance.isActive("link"),
-      isCode: editorInstance.isActive("code"),
-      isHeading1: editorInstance.isActive("heading", { level: 1 }),
-      isHeading2: editorInstance.isActive("heading", { level: 2 }),
-      isHeading3: editorInstance.isActive("heading", { level: 3 }),
-      isBulletList: editorInstance.isActive("bulletList"),
-      isOrderedList: editorInstance.isActive("orderedList"),
-      isBlockquote: editorInstance.isActive("blockquote"),
-      isCodeBlock: editorInstance.isActive("codeBlock"),
     }),
   });
 
   const chain = () => editor.chain().focus();
 
   return (
-    <div
-      role="toolbar"
-      aria-label="Formatting"
-      className="flex flex-wrap items-center gap-0.5"
-    >
+    <div role="toolbar" aria-label="Document" className="flex flex-wrap items-center gap-0.5">
       <ToolbarButton label="Undo" isDisabled={!state.canUndo} onClick={() => chain().undo().run()}>
         <Undo2 className="size-3.5" aria-hidden />
       </ToolbarButton>
@@ -85,101 +44,9 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <Redo2 className="size-3.5" aria-hidden />
       </ToolbarButton>
 
-      <ToolbarDivider />
-
-      <ToolbarButton label="Heading 1" isActive={state.isHeading1} onClick={() => chain().toggleHeading({ level: 1 }).run()}>
-        <Heading1 className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton label="Heading 2" isActive={state.isHeading2} onClick={() => chain().toggleHeading({ level: 2 }).run()}>
-        <Heading2 className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton label="Heading 3" isActive={state.isHeading3} onClick={() => chain().toggleHeading({ level: 3 }).run()}>
-        <Heading3 className="size-3.5" aria-hidden />
-      </ToolbarButton>
-
-      <ToolbarDivider />
-
-      <ToolbarButton label="Bold" isActive={state.isBold} onClick={() => chain().toggleBold().run()}>
-        <Bold className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton label="Italic" isActive={state.isItalic} onClick={() => chain().toggleItalic().run()}>
-        <Italic className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton label="Strikethrough" isActive={state.isStrike} onClick={() => chain().toggleStrike().run()}>
-        <Strikethrough className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton
-        label="Underline"
-        isActive={state.isUnderline}
-        onClick={() => setOpenColorPicker((current) => (current === "underline" ? null : "underline"))}
-      >
-        <Underline className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      {openColorPicker === "underline" && (
-        <MarkColorSwatches
-          variant="underline"
-          isColorActive={(color) => editor.isActive("underline", { color })}
-          onPick={(color) => chain().toggleMark("underline", { color }).run()}
-        />
-      )}
-      <ToolbarButton
-        label="Circle text"
-        isActive={state.isCircle}
-        onClick={() => setOpenColorPicker((current) => (current === "circle" ? null : "circle"))}
-      >
-        <Circle className="size-3.5 text-ai-circle" aria-hidden />
-      </ToolbarButton>
-      {openColorPicker === "circle" && (
-        <MarkColorSwatches
-          variant="circle"
-          isColorActive={(color) => editor.isActive("circle", { color })}
-          onPick={(color) => chain().toggleCircle({ color }).run()}
-        />
-      )}
-      <ToolbarButton
-        label="Highlight"
-        isActive={state.isHighlighted || openColorPicker === "highlight"}
-        onClick={() => setOpenColorPicker((current) => (current === "highlight" ? null : "highlight"))}
-      >
-        <Highlighter className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      {openColorPicker === "highlight" && (
-        <MarkColorSwatches
-          variant="highlight"
-          isColorActive={(color) => editor.isActive("highlight", { color })}
-          onPick={(color) => chain().toggleHighlight({ color }).run()}
-          onRemove={state.isHighlighted ? () => chain().unsetHighlight().run() : undefined}
-        />
-      )}
-      <ToolbarButton label="Inline code" isActive={state.isCode} onClick={() => chain().toggleCode().run()}>
-        <Code className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <LinkControl editor={editor} isActive={state.isLink} />
-      <ImageControl editor={editor} />
-      <EmojiControl editor={editor} />
-
-      <ToolbarDivider />
-
-      <ToolbarButton label="Bullet list" isActive={state.isBulletList} onClick={() => chain().toggleBulletList().run()}>
-        <List className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton label="Numbered list" isActive={state.isOrderedList} onClick={() => chain().toggleOrderedList().run()}>
-        <ListOrdered className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton label="Quote" isActive={state.isBlockquote} onClick={() => chain().toggleBlockquote().run()}>
-        <TextQuote className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton label="Code block" isActive={state.isCodeBlock} onClick={() => chain().toggleCodeBlock().run()}>
-        <SquareCode className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton label="Divider line" onClick={() => chain().setHorizontalRule().run()}>
-        <Minus className="size-3.5" aria-hidden />
-      </ToolbarButton>
-      <ToolbarButton label="Insert page break (⌘↵)" onClick={() => chain().setPageBreak().run()}>
-        <SeparatorHorizontal className="size-3.5" aria-hidden />
-      </ToolbarButton>
-
       <div className="ml-auto flex items-center gap-0.5 pl-2">
+        <LastHighlightButton editor={editor} />
+        <BookModeButton />
         <ToolbarDivider />
         <FontControl />
         <PageWidthControl />

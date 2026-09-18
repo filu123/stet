@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import type { Editor } from "@tiptap/react";
 
 import { readApiKey } from "@/features/settings";
+import { randomId } from "@/lib/utils/random-id";
 import { useAiReviewStore } from "@/stores/ai-review-store";
 import { useSettingsStore } from "@/stores/settings-store";
 import type { Suggestion } from "@/types/ai";
@@ -80,7 +81,7 @@ export function useProactiveReview(editor: Editor | null): void {
           if (isDuplicate) continue;
 
           const suggestion = {
-            id: crypto.randomUUID(),
+            id: randomId(),
             kind: rawSuggestion.kind,
             quote: rawSuggestion.quote,
             occurrence: rawSuggestion.occurrence,
