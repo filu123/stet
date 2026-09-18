@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import { buildCharacterIndex } from "./character-index";
 import { CHUNK_SIZES, buildChunks } from "./chunker";
@@ -22,8 +22,16 @@ import { bookProgress, wordsToNextBreak } from "./reading-position";
 const BOOK_PATH = resolve(process.cwd(), ".local-books/dracula.txt");
 
 describe.skipIf(!existsSync(BOOK_PATH))("a real novel, end to end", () => {
-  const book = parsePlainTextBook(readFileSync(BOOK_PATH, "utf8"), "dracula.txt");
-  const chunks = buildChunks(book.chapters, CHUNK_SIZES.medium);
+  let book: ReturnType<typeof parsePlainTextBook>;
+  let chunks: ReturnType<typeof buildChunks>;
+
+  // The suite is skipped when the optional local fixture is absent. Keep the
+  // file read in a lifecycle hook so Vitest does not evaluate it while merely
+  // collecting a skipped suite in CI.
+  beforeAll(() => {
+    book = parsePlainTextBook(readFileSync(BOOK_PATH, "utf8"), "dracula.txt");
+    chunks = buildChunks(book.chapters, CHUNK_SIZES.medium);
+  });
 
   it("reads the metadata out of the Gutenberg header", () => {
     expect(book.title).toContain("Dracula");
